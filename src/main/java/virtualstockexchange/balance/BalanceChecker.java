@@ -210,7 +210,7 @@ public class BalanceChecker {
 		return null;
 	}
 
-	public List<Balance> getBalances(String account) {
+	public List<Balance> getBalances(String account) {		
 		return balanceMap.get(account);
 	}
 	
@@ -251,11 +251,8 @@ public class BalanceChecker {
 			balance.setT2(balance.getT1());
 			balance.setT1(0);
 		} else if (balance.getT2() > 0) {
-			balance.setT3(balance.getT2());
+			balance.setAmount(balance.getAmount() + balance.getT2());
 			balance.setT2(0);
-		} else if (balance.getT3() > 0) {
-			balance.setAmount(balance.getAmount() + balance.getT3());
-			balance.setT3(0);
 		}
 	}
 }

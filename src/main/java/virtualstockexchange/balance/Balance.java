@@ -7,7 +7,6 @@ public class Balance {
 	private long t0;
 	private long t1;
 	private long t2;
-	private long t3;
 	
 	
 	public long getAmount() {
@@ -45,11 +44,5 @@ public class Balance {
 	}
 	public void setT2(long t2) {
 		this.t2 = t2;
-	}
-	public long getT3() {
-		return t3;
-	}
-	public void setT3(long t3) {
-		this.t3 = t3;
 	}
 }
