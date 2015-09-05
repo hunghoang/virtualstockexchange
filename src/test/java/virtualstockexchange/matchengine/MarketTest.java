@@ -9,9 +9,9 @@ public class MarketTest {
 	
 	@Test
 	public void testPlaceOrderInMarket() {
-		market.place(new Order("VND", 1, 2, Side.BUY));
-		market.place(new Order("SSI", 1, 2, Side.BUY));
-		market.place(new Order("ACB", 1, 2, Side.SELL));
+		market.place(new Order("abc", "VND", 1, 2, Side.BUY));
+		market.place(new Order("abc", "SSI", 1, 2, Side.BUY));
+		market.place(new Order("abc", "ACB", 1, 2, Side.SELL));
 		Assert.assertEquals(3, market.getAllOrders().size());
 	}
 	
@@ -34,8 +34,8 @@ public class MarketTest {
 	}
 	
 	@Test
-	public void testCancelBuyOrderInMarket() {
-		Order order = new Order("VND", 1, 2, Side.BUY);
+	public void testCancelBuyOrderInMarketAndCheckHistory() {
+		Order order = new Order("abc", "VND", 1, 2, Side.BUY);
 		market.place(order);
 		String orderId = order.getOrderId();
 		market.cancel(orderId);
@@ -47,7 +47,7 @@ public class MarketTest {
 	
 	@Test
 	public void testCancelSellOrderInMarket() {
-		Order order = new Order("VND", 1, 2, Side.SELL);
+		Order order = new Order("abc", "VND", 1, 2, Side.SELL);
 		market.place(order);
 		String orderId = order.getOrderId();
 		market.cancel(orderId);
