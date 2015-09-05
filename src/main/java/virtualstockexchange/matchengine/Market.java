@@ -48,7 +48,7 @@ public class Market {
 	}
 	
 	public List<Order> getAllOrders() {
-		return new ArrayList<Order>(orders.values());
+		return new ArrayList<Order>(historyOrders.values());
 	}
 
 	public MatchOrder getMatchOrder(String symbol) {

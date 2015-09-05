@@ -1,6 +1,7 @@
 package virtualstockexchange.matchengine;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Order {
@@ -17,13 +18,15 @@ public class Order {
 	private String status;
 
 	private String orderId;
+	
+	private Date date;
 
 	public static final Order EMPTY = new Order();
 
 	private List<Order> childs = new ArrayList<Order>();
 	
 	private Order() {
-
+		this.date = new Date();
 	}
 
 	public Order(String account, String symbol, long price, int quantity,
@@ -38,6 +41,7 @@ public class Order {
 	}
 
 	public Order(String symbol, long price, int quantity, int side) {
+		this();
 		this.side = side;
 		this.price = price;
 		this.quantity = quantity;
@@ -137,6 +141,14 @@ public class Order {
 
 	public List<Order> getChilds() {
 		return childs;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 }

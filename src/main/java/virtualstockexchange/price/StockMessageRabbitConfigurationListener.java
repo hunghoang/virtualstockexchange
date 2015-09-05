@@ -9,14 +9,17 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import virtualstockexchange.matchengine.Market;
 import virtualstockexchange.matchengine.Order;
 import virtualstockexchange.matchengine.OrderCreator;
+import virtualstockexchange.matchengine.OrderReportHandler;
 import vn.com.vndirect.priceservice.datamodel.SecInfo;
 
 @Component
+@DependsOn("orderReportHandler")
 public class StockMessageRabbitConfigurationListener extends
 		MessageRabbitConfigurationListener {
 	
@@ -50,7 +53,6 @@ public class StockMessageRabbitConfigurationListener extends
 	
 	@Override
 	public void handleMessage(Object object) {
-		System.out.println((((SecInfo) object).getCode() + " - bid:" +  ((SecInfo) object).getBidPrice01() + " - basic:" + ((SecInfo) object).getBasicPrice()));
 		List<Order> orders = orderCreator.createOrder((SecInfo) object);
 		for (Order order : orders) {
 			List<Order> reports = market.place(order);

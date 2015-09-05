@@ -24,8 +24,11 @@ public class WebConfig extends WebMvcConfigurerAdapter implements WebSocketConfi
 	@Autowired
 	private ApplicationContext applicationContext;
 	
+	@Autowired
+	private NotifyWebSocketHandler notifyWebSocketHandler;
+	
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-
+		registry.addHandler(notifyWebSocketHandler, "/realtime/order").withSockJS();
 	}
 
 	@ControllerAdvice
