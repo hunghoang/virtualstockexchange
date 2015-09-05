@@ -23,6 +23,30 @@ public class BalanceChecker {
 		}
 	}
 
+	public void initAccount(String account) throws BalanceException {
+		if (balanceMap.containsKey(account))
+			throw new BalanceException("Account already exist: " + account);
+		Balance moneyBalance = new Balance();
+		List<Balance> balances = new ArrayList<Balance>();
+		moneyBalance.setAmount(DEFAULT_MONEY);
+		balances.add(moneyBalance);
+		balanceMap.put(account, balances);
+	}
+
+	public Balance initSecBalance(String account, String symbol, int quantity)
+			throws BalanceException {
+		if (!isValidAccount(account))
+			throw new BalanceException("Account is not exist: " + account);
+		if (quantity <= 0)
+			throw new BalanceException("Quantity smaller than 0 or equal 0: "
+					+ quantity);
+		Balance secBalance = new Balance();
+		secBalance.setAmount(quantity);
+		secBalance.setSecCode(symbol);
+
+		return secBalance;
+	}
+	
 	public void initBalanceMap() throws BalanceException {
 		String user1 = "ha_nguyen";
 		initAccount(user1);
@@ -48,7 +72,7 @@ public class BalanceChecker {
 
 	public void holdMoney(String account, long money) throws BalanceException {
 		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
+			throw new BalanceException("Account is not exist: " + account);
 		List<Balance> balances = balanceMap.get(account);
 		Balance moneyBalance = getMoneyBalance(balances);
 		if (!isEnoughMoney(money, moneyBalance))
@@ -60,7 +84,7 @@ public class BalanceChecker {
 
 	public void addMoney(String account, long money) throws BalanceException {
 		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
+			throw new BalanceException("Account is not exist: " + account);
 		if (money <= 0)
 			throw new BalanceException("Money smaller than 0 or equal 0: "
 					+ money);
@@ -72,7 +96,7 @@ public class BalanceChecker {
 	public void holdSecurity(String account, String secCode, int quantity)
 			throws BalanceException {
 		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
+			throw new BalanceException("Account is not exist: " + account);
 		Balance secBalance = getSecBalance(account, secCode);
 		if (quantity <= 0)
 			throw new BalanceException("Quantity smaller than 0 or equal 0: "
@@ -89,38 +113,22 @@ public class BalanceChecker {
 		if (quantity <= 0)
 			throw new BalanceException("Quantity smaller than 0 or equal 0: "
 					+ quantity);
-		if (isExsitSymbol(account, secCode)) {
+		if (isExistSymbol(account, secCode)) {
 			Balance secBalance = getSecBalance(account, secCode);
 			secBalance.setT0(quantity);
 		} else {
 			Balance secBalanceNew = new Balance();
-			secBalanceNew.setAmount(quantity);
+			secBalanceNew.setT0(quantity);
 			secBalanceNew.setSecCode(secCode);
 			List<Balance> userBalance = balanceMap.get(account);
 			userBalance.add(secBalanceNew);			
 		}
 	}
 	
-	private boolean isExsitSymbol(String account, String symbol) {
-		List<Balance> balances = balanceMap.get(account);
-		int length = balances.size();
-		int count = 0;
-		for (int i = 1; i <= length; i++) {
-			if (symbol.equals(balances.get(i).getSecCode())) {
-				count++;
-			}
-		}
-		
-		if (count > 0)
-			return false;
-		
-		return true;
-	}
-
 	public void cancelHoldMoney(String account, long money)
 			throws BalanceException {
 		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
+			throw new BalanceException("Account is not exist: " + account);
 		List<Balance> balances = balanceMap.get(account);
 		Balance moneyBalance = getMoneyBalance(balances);
 		moneyBalance.setAmount(moneyBalance.getAmount() + money);
@@ -129,36 +137,27 @@ public class BalanceChecker {
 	public void cancelHoldSecurity(String account, String secCode, long quantity)
 			throws BalanceException {
 		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
+			throw new BalanceException("Account is not exist: " + account);
 		Balance secBalance = getSecBalance(account, secCode);
 		if (quantity <= 0)
 			throw new BalanceException("Quantity smaller than 0 or equal 0: "
 					+ quantity);
 		secBalance.setAmount(secBalance.getAmount() + quantity);
 	}
-
-	public void initAccount(String account) throws BalanceException {
-		if (balanceMap.containsKey(account))
-			throw new BalanceException("Account already exsit: " + account);
-		Balance moneyBalance = new Balance();
-		List<Balance> balances = new ArrayList<Balance>();
-		moneyBalance.setAmount(DEFAULT_MONEY);
-		balances.add(moneyBalance);
-		balanceMap.put(account, balances);
-	}
-
-	public Balance initSecBalance(String account, String symbol, int quantity)
-			throws BalanceException {
-		if (!isValidAccount(account))
-			throw new BalanceException("Account is not exsit: " + account);
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
-		Balance secBalance = new Balance();
-		secBalance.setAmount(quantity);
-		secBalance.setSecCode(symbol);
-
-		return secBalance;
+	
+	private boolean isExistSymbol(String account, String symbol) {
+		List<Balance> balances = balanceMap.get(account);
+		int length = balances.size();
+		int count = 0;
+		for (int i = 0; i < length; i++) {
+			if (symbol.equals(balances.get(i).getSecCode())) {
+				count++;
+			}
+		}
+		if (count > 0)
+			return true;
+		
+		return false;
 	}
 
 	private boolean isEnoughMoney(long money, Balance moneyBalance) {
@@ -202,33 +201,7 @@ public class BalanceChecker {
 		}
 		throw new BalanceException("No balance for: " + symbol + " of " + account);
 	}
-
-	public void nextMoney(String account) {
-		Balance balance = getMoneyBalance(account);
-		switchDay(balance);
-	}
 	
-	public void nextSecurity(String account, String symbol) throws BalanceException {
-		Balance balance = getSecBalance(account, symbol);
-		switchDay(balance);
-	}
-	
-	public void switchDay (Balance balance) {
-		if (balance.getT0() > 0) {
-			balance.setT1(balance.getT0());
-			balance.setT0(0);
-		} else if (balance.getT1() > 0) {
-			balance.setT2(balance.getT1());
-			balance.setT1(0);
-		} else if (balance.getT2() > 0) {
-			balance.setT3(balance.getT2());
-			balance.setT2(0);
-		} else if (balance.getT3() > 0) {
-			balance.setAmount(balance.getAmount() + balance.getT3());
-			balance.setT3(0);
-		}
-	}
-
 	public Balance getMoneyBalance(String account) {
 		List<Balance> balances = balanceMap.get(account);
 		if (balances.size() > 0) {
@@ -258,5 +231,31 @@ public class BalanceChecker {
 			}
 		}
 		return currentMoney;
+	}
+
+	public void nextMoney(String account) {
+		Balance balance = getMoneyBalance(account);
+		switchDay(balance);
+	}
+	
+	public void nextSecurity(String account, String symbol) throws BalanceException {
+		Balance balance = getSecBalance(account, symbol);
+		switchDay(balance);
+	}
+	
+	public void switchDay (Balance balance) {
+		if (balance.getT0() > 0) {
+			balance.setT1(balance.getT0());
+			balance.setT0(0);
+		} else if (balance.getT1() > 0) {
+			balance.setT2(balance.getT1());
+			balance.setT1(0);
+		} else if (balance.getT2() > 0) {
+			balance.setT3(balance.getT2());
+			balance.setT2(0);
+		} else if (balance.getT3() > 0) {
+			balance.setAmount(balance.getAmount() + balance.getT3());
+			balance.setT3(0);
+		}
 	}
 }
