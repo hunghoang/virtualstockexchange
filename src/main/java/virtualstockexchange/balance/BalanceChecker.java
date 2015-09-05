@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import virtualstockexchange.price.PriceService;
+
 @Component
 public class BalanceChecker {
 	long DEFAULT_MONEY = 50000000;
@@ -222,21 +224,22 @@ public class BalanceChecker {
 		return balanceMap.get(account);
 	}
 	
-	public long getTotalAssets(String account, long price) {
+	public long getTotalAssets(String account) {
 		Balance moneyBalance = getMoneyBalance(account);
 		long currentMoney = 0;
 		currentMoney += moneyBalance.getAmount() + moneyBalance.getT0() + moneyBalance.getT0()
-				 + moneyBalance.getT1() + moneyBalance.getT2() + moneyBalance.getT3()
-				 -  + moneyBalance.getHold();
+				 + moneyBalance.getT1() + moneyBalance.getT2()
+				 - moneyBalance.getHold();
 		
 		List<Balance> balances = balanceMap.get(account);
+		PriceService priceService = new PriceService();
 		for (Balance balance : balances) {
 			if (!balance.getSecCode().equals(null)) {
-				currentMoney += (moneyBalance.getAmount() + moneyBalance.getT0() + moneyBalance.getT0()
-						 + moneyBalance.getT1() + moneyBalance.getT2() + moneyBalance.getT3()
-						 -  + moneyBalance.getHold()) * price;
+				currentMoney += (balance.getAmount() + balance.getT0() + balance.getT0()
+						 + balance.getT1() + balance.getT2()
+						 - balance.getHold()) * priceService.getPrice(balance.getSecCode());
 			}
 		}
-		return 0;
+		return currentMoney;
 	}
 }
