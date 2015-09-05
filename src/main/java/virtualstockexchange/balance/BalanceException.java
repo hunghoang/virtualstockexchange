@@ -1,4 +1,4 @@
-package virtualstockexchange;
+package virtualstockexchange.balance;
 
 public class BalanceException extends Exception {
 	 

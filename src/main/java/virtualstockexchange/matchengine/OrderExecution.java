@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import virtualstockexchange.balance.BalanceChecker;
+import virtualstockexchange.balance.BalanceException;
+
 @Component
 public class OrderExecution {
 
@@ -35,14 +38,19 @@ public class OrderExecution {
 
 	public Order executeCancelledOrder(Order order) {
 		Order cancelledOrder = market.cancel(order.getOrderId());
+		try {
 		if (cancelledOrder != null) {
 			if (cancelledOrder.getSide() == Side.BUY) {
 				long hold = cancelledOrder.getPrice() * cancelledOrder.getRemainQuantity();
-				balanceChecker.holdMoney(cancelledOrder.getAccount(), -hold);
+					balanceChecker.holdMoney(cancelledOrder.getAccount(), -hold);
 			} else {
 				balanceChecker.holdSecurity(cancelledOrder.getAccount(),
 						cancelledOrder.getSymbol(), -cancelledOrder.getRemainQuantity());
 			}
+		}
+		} catch (BalanceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return cancelledOrder;
 	}

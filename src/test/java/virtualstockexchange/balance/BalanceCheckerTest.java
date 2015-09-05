@@ -1,4 +1,4 @@
-package virtualstockexchange;
+package virtualstockexchange.balance;
 
 import java.util.ArrayList;
 import java.util.List;

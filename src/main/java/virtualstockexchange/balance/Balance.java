@@ -1,4 +1,4 @@
-package virtualstockexchange;
+package virtualstockexchange.balance;
 
 public class Balance {
 	private long amount;

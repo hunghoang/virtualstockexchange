@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import virtualstockexchange.balance.BalanceChecker;
+import virtualstockexchange.balance.BalanceException;
+
 public class OrderExecutionTest {
 
 	private String curAccount;
@@ -13,13 +16,13 @@ public class OrderExecutionTest {
 	
 	private BalanceChecker balanceChecker = new BalanceChecker() {
 		@Override
-		public void holdMoney(String account, long money) {
+		public void holdMoney(String account, long money)  throws BalanceException {
 			curAccount = account;
 			curHold = money;
 		}
 
 		@Override
-		public void holdSecurity(String account, String sec, int quantity) {
+		public void holdSecurity(String account, String sec, int quantity)   throws BalanceException {
 			curAccount = account;
 			curHold = quantity;
 			curSec = sec;
