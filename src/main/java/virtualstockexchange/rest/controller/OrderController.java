@@ -10,18 +10,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import virtualstockexchange.balance.BalanceException;
 import virtualstockexchange.matchengine.Market;
 import virtualstockexchange.matchengine.Order;
+import virtualstockexchange.matchengine.OrderExecution;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
 	
+	private OrderExecution orderExecution;
 	private Market market;
 	
 	@Autowired
-	public OrderController(Market market) {
+	public OrderController(Market market, OrderExecution orderExecution) {
 		this.market = market;
+		this.orderExecution = orderExecution;
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -41,4 +45,15 @@ public class OrderController {
 		}
 		return "Order not found: " + orderid;
 	}
+	
+	@RequestMapping(value = "/unHoldAll", method = RequestMethod.POST)
+	public @ResponseBody String unHoldAllOrders() {
+		try {
+			orderExecution.unHoldAllOrder();
+		} catch (BalanceException e) {
+			return e.getMessage();
+		}
+		return "OK";
+	}
+	
 }

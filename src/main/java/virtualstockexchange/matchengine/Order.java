@@ -78,9 +78,9 @@ public class Order {
 
 	private void updateStatusWhenMatch() {
 		if (matchQuantity == quantity) {
-			status = "FILLED";
+			status = OrderStatus.FILLED;
 		} else {
-			status = "PARTIAL_FILLED";
+			status =  OrderStatus.PARTIAL_FILLED;
 		}
 	}
 
@@ -105,7 +105,7 @@ public class Order {
 	}
 
 	public boolean isClosed() {
-		return "CANCELLED".equals(status) || (quantity == matchQuantity && account != null);
+		return OrderStatus.CANCELLED.equals(status) || (quantity == matchQuantity && account != null);
 	}
 
 	public String getSymbol() {

@@ -57,17 +57,29 @@ public class OrderExecution {
 	public Order executeCancelledOrder(Order order) throws BalanceException {
 		Order cancelledOrder = market.cancel(order.getOrderId());
 		if (cancelledOrder != null) {
-			if (cancelledOrder.getSide() == Side.BUY) {
-				long hold = cancelledOrder.getPrice()
-						* cancelledOrder.getRemainQuantity();
-				balanceChecker.holdMoney(cancelledOrder.getAccount(), -hold);
-			} else {
-				balanceChecker.holdSecurity(cancelledOrder.getAccount(),
-						cancelledOrder.getSymbol(),
-						-cancelledOrder.getRemainQuantity());
-			}
+			unHoldOrder(cancelledOrder);
 		}
 		return cancelledOrder;
 	}
 
+	private void unHoldOrder(Order order) throws BalanceException {
+		if (order.getSide() == Side.BUY) {
+			long hold = order.getPrice()
+					* order.getRemainQuantity();
+			balanceChecker.holdMoney(order.getAccount(), -hold);
+		} else {
+			balanceChecker.holdSecurity(order.getAccount(),
+					order.getSymbol(),
+					-order.getRemainQuantity());
+		}
+	}
+	
+	public void unHoldAllOrder() throws BalanceException {
+		List<Order> orders = market.getAllOrders();
+		for (Order order : orders) {
+			if (!order.isClosed()) {
+				unHoldOrder(order);
+			}
+		}
+	}
 }

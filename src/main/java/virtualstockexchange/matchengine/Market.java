@@ -32,7 +32,7 @@ public class Market {
 		}
 		orders.put(order.getOrderId(), order);
 		updateHistory(order);
-		order.setStatus("SENT");
+		order.setStatus(OrderStatus.SENT);
 		return matchOrder.match(order);
 	}
 
@@ -58,7 +58,7 @@ public class Market {
 		}
 		MatchOrder matchOrder = matchOrderMap.get(order.getSymbol());
 		matchOrder.remove(order);
-		order.setStatus("CANCELLED");
+		order.setStatus(OrderStatus.CANCELLED);
 		return order;
 	}
 	
@@ -69,6 +69,7 @@ public class Market {
 	public MatchOrder getMatchOrder(String symbol) {
 		return matchOrderMap.get(symbol);
 	}
+
 
 
 }
