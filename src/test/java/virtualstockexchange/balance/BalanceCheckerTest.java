@@ -194,4 +194,44 @@ public class BalanceCheckerTest {
 		long totalAssets = checker.getTotalAssets("ha_nguyen");
 		Assert.assertEquals(50000000, totalAssets);
 	}
+	
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testNextMoney() throws BalanceException{
+		balance.setAmount(200000);
+		balance.setT0(1000);
+		
+		balances.add(balance);
+		balanceMap.put("abc", balances);
+		
+		checker.nextMoney("abc");
+		checker.nextMoney("abc");
+		List<Balance> testBalances = balanceMap.get("abc");
+		Balance testBalance = checker.getMoneyBalance(testBalances);
+		Assert.assertEquals(0, testBalance.getT0());
+		Assert.assertEquals(0, testBalance.getT1());
+		Assert.assertEquals(1000, testBalance.getT2());
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testNextSecurity() throws BalanceException{
+		secBalance.setAmount(2000);
+		secBalance.setSecCode("VND");
+		secBalance.setT0(1000);
+		
+		balances.add(secBalance);
+		balanceMap.put("abc", balances);
+		
+		checker.nextSecurity("abc", "VND");
+		checker.nextSecurity("abc", "VND");
+		checker.nextSecurity("abc", "VND");
+//		checker.nextSecurity("abc", "VND");
+		
+		Balance testBalance = checker.getSecBalance("abc", "VND");
+		Assert.assertEquals(0, testBalance.getT0());
+		Assert.assertEquals(0, testBalance.getT1());
+		Assert.assertEquals(0, testBalance.getT2());
+		Assert.assertEquals(3000, testBalance.getAmount());
+	}
 }
