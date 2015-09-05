@@ -179,38 +179,33 @@ public class BalanceChecker {
 		throw new BalanceException("No balance for: " + symbol + " of " + account);
 	}
 
-	public void nextMoney(String account, int day) {
+	public void nextMoney(String account) {
 		Balance balance = getMoneyBalance(account);
-		switchDay(day, balance);
+		switchDay(balance);
 	}
 	
-	public void nextSecurity(String account, int day, String symbol) throws BalanceException {
+	public void nextSecurity(String account, String symbol) throws BalanceException {
 		Balance balance = getSecBalance(account, symbol);
-		switchDay(day, balance);
+		switchDay(balance);
 	}
 	
-	public void switchDay (int day, Balance balance) {
-		switch (day) {
-		case 0:
+	public void switchDay (Balance balance) {
+		if (balance.getT0() > 0) {
 			balance.setT1(balance.getT0());
 			balance.setT0(0);
-			break;
-		case 1:
+		} else if (balance.getT1() > 0) {
 			balance.setT2(balance.getT1());
 			balance.setT1(0);
-			break;
-		case 2:
+		} else if (balance.getT2() > 0) {
 			balance.setT3(balance.getT2());
 			balance.setT2(0);
-			break;
-		case 3:
+		} else if (balance.getT3() > 0) {
 			balance.setAmount(balance.getAmount() + balance.getT3());
 			balance.setT3(0);
-			break;
-		default:
-			break;
 		}
 	}
+	
+	
 
 	public Balance getMoneyBalance(String account) {
 		List<Balance> balances = balanceMap.get(account);
