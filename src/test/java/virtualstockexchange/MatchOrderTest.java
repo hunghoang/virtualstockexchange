@@ -117,7 +117,6 @@ public class MatchOrderTest {
 				Side.BUY));
 		Assert.assertEquals(0, orders1.size());
 		Assert.assertEquals(0, orders2.size());
-
 		Assert.assertEquals(4, orders3.size());
 		Assert.assertEquals(12100, orders3.get(0).getMatchPrice());
 		Assert.assertEquals(1000, orders3.get(0).getMatchQuantity());
@@ -128,7 +127,7 @@ public class MatchOrderTest {
 		Assert.assertEquals(12300, orders3.get(3).getMatchPrice());
 		Assert.assertEquals(6000, orders3.get(3).getMatchQuantity());
 	}
-
+	
 	@Test
 	public void putBuyOrdersAndCheckPosition() {
 		matchOrder.putOrder(new Order("", 1, 1, Side.BUY));
@@ -142,6 +141,27 @@ public class MatchOrderTest {
 		Assert.assertEquals(3, buyOrders.get(2).getPrice());
 		Assert.assertEquals(2, buyOrders.get(3).getPrice());
 		Assert.assertEquals(1, buyOrders.get(4).getPrice());
+	}
+
+	@Test
+	public void putBuyOrdersWithSamePriceAndCheckPosition() {
+		matchOrder.putOrder(new Order("", 4, 1, Side.BUY));
+		matchOrder.putOrder(new Order("", 3, 1, Side.BUY));
+		matchOrder.putOrder(new Order("", 2, 500, Side.BUY));
+		matchOrder.putOrder(new Order("", 1, 1, Side.BUY));
+		matchOrder.putOrder(new Order("", 2, 200, Side.BUY));
+		matchOrder.putOrder(new Order("", 5, 1, Side.BUY));
+		matchOrder.putOrder(new Order("", 2, 300, Side.BUY));
+		List<Order> buyOrders = matchOrder.getBuys();
+		Assert.assertEquals(5, buyOrders.get(0).getPrice());
+		Assert.assertEquals(4, buyOrders.get(1).getPrice());
+		Assert.assertEquals(3, buyOrders.get(2).getPrice());
+		Assert.assertEquals(2, buyOrders.get(3).getPrice());
+		Assert.assertEquals(500, buyOrders.get(3).getQuantity());
+		Assert.assertEquals(2, buyOrders.get(4).getPrice());
+		Assert.assertEquals(200, buyOrders.get(4).getQuantity());
+		Assert.assertEquals(2, buyOrders.get(5).getPrice());
+		Assert.assertEquals(300, buyOrders.get(5).getQuantity());
 	}
 
 	@Test

@@ -61,10 +61,18 @@ public class MatchOrder {
 
 	private void putBuyOrder(Order order, long price) {
 		int size = buyOrders.size();
+		long nextPriceBuy = -1;
 		for (int i = 0; i < size; i++) {
 			long priceBuy = buyOrders.get(i).getPrice();
-			if (price >= priceBuy) {
-				buyOrders.add(i, order);
+			if ( i < size - 1) {
+				nextPriceBuy = buyOrders.get(i + 1).getPrice();
+			}
+			if (price >= priceBuy && price > nextPriceBuy) {
+				if ( i < size - 1 && price == priceBuy) {
+					buyOrders.add(i + 1, order);
+				} else {
+					buyOrders.add(i, order);
+				}
 				return;
 			}
 		}
@@ -81,7 +89,11 @@ public class MatchOrder {
 			}
 			
 			if (price <= priceSell && price < nextPriceSell) {
-				sellOrders.add(i, order);
+				if ( i < size - 1 && price == priceSell) {
+					sellOrders.add(i + 1, order);
+				} else {
+					sellOrders.add(i, order);
+				}
 				return;
 			}
 		}
