@@ -89,8 +89,32 @@ public class BalanceChecker {
 		if (quantity <= 0)
 			throw new BalanceException("Quantity smaller than 0 or equal 0: "
 					+ quantity);
-		Balance secBalance = getSecBalance(account, secCode);
-		secBalance.setT0(quantity);
+		if (isExsitSymbol(account, secCode)) {
+			Balance secBalance = getSecBalance(account, secCode);
+			secBalance.setT0(quantity);
+		} else {
+			Balance secBalanceNew = new Balance();
+			secBalanceNew.setAmount(quantity);
+			secBalanceNew.setSecCode(secCode);
+			List<Balance> userBalance = balanceMap.get(account);
+			userBalance.add(secBalanceNew);			
+		}
+	}
+	
+	private boolean isExsitSymbol(String account, String symbol) {
+		List<Balance> balances = balanceMap.get(account);
+		int length = balances.size();
+		int count = 0;
+		for (int i = 1; i <= length; i++) {
+			if (symbol.equals(balances.get(i).getSecCode())) {
+				count++;
+			}
+		}
+		
+		if (count > 0)
+			return false;
+		
+		return true;
 	}
 
 	public void cancelHoldMoney(String account, long money)
@@ -204,8 +228,6 @@ public class BalanceChecker {
 			balance.setT3(0);
 		}
 	}
-	
-	
 
 	public Balance getMoneyBalance(String account) {
 		List<Balance> balances = balanceMap.get(account);
