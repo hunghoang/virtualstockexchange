@@ -1,10 +1,8 @@
 package virtualstockexchange.matchengine;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

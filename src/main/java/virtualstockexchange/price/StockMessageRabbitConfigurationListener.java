@@ -32,6 +32,9 @@ public class StockMessageRabbitConfigurationListener extends
 	private Market market;
 	
 	@Autowired
+	private PriceService priceService;
+	
+	@Autowired
 	private OrderReportHandler orderReportHandler;
 	
 	@Autowired
@@ -54,6 +57,7 @@ public class StockMessageRabbitConfigurationListener extends
 	@Override
 	public void handleMessage(Object object) {
 		List<Order> orders = orderCreator.createOrder((SecInfo) object);
+		priceService.updateSec((SecInfo) object);
 		for (Order order : orders) {
 			List<Order> reports = market.place(order);
 			orderReportHandler.update(reports);

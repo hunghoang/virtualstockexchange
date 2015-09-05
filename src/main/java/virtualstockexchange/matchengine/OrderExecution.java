@@ -21,7 +21,7 @@ public class OrderExecution {
 		this.market = market;
 	}
 
-	public List<Order> executeOrder(Order order) {
+	public List<Order> executeOrder(Order order) throws BalanceException {
 		try {
 			if (order.getSide() == Side.BUY) {
 				long hold = order.getPrice() * order.getQuantity();
@@ -36,9 +36,8 @@ public class OrderExecution {
 		return market.place(order);
 	}
 
-	public Order executeCancelledOrder(Order order) {
+	public Order executeCancelledOrder(Order order) throws BalanceException {
 		Order cancelledOrder = market.cancel(order.getOrderId());
-		try {
 		if (cancelledOrder != null) {
 			if (cancelledOrder.getSide() == Side.BUY) {
 				long hold = cancelledOrder.getPrice() * cancelledOrder.getRemainQuantity();
@@ -47,10 +46,6 @@ public class OrderExecution {
 				balanceChecker.holdSecurity(cancelledOrder.getAccount(),
 						cancelledOrder.getSymbol(), -cancelledOrder.getRemainQuantity());
 			}
-		}
-		} catch (BalanceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return cancelledOrder;
 	}

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import virtualstockexchange.balance.BalanceException;
 import virtualstockexchange.matchengine.Market;
 import virtualstockexchange.matchengine.Order;
 import virtualstockexchange.matchengine.OrderExecution;
@@ -45,7 +46,14 @@ public class AccountOrderController {
 		Order order = new Order(accountNumber, orderRequest.getSymbol(),
 				orderRequest.getPrice(), orderRequest.getQuantity(), side);
 		String orderId = order.getOrderId();
-		List<Order> orders = orderExecution.executeOrder(order);
+		List<Order> orders;
+		try {
+			orders = orderExecution.executeOrder(order);
+		} catch (BalanceException e) {
+			Order error = Order.getDefaultOrder();
+			error.setStatus("Tai khoan khong du de dat lenh");
+			return error;
+		}
 
 		for (Order result : orders) {
 			if (result.getOrderId().equals(orderId)) {
@@ -60,6 +68,12 @@ public class AccountOrderController {
 		System.out.println("cancel order for account: " + accountNumber + " with orderid " + orderId);
 		Order order = new Order("", 0, 0 ,0);
 		order.setOrderId(orderId);
-		return orderExecution.executeCancelledOrder(order);
+		try {
+			return orderExecution.executeCancelledOrder(order);
+		} catch (BalanceException e) {
+			Order error = Order.getDefaultOrder();
+			error.setStatus("Co loi khi dat lenh");
+			return error;
+		}
 	}
 }

@@ -39,7 +39,7 @@ public class OrderExecutionTest {
 	});
 
 	@Test
-	public void testOrderExecutionPlaceBuyOrder() {
+	public void testOrderExecutionPlaceBuyOrder() throws BalanceException {
 		orderExecution.executeOrder(fakeOrder);
 		Assert.assertEquals("SENT", fakeOrder.getStatus());
 		Assert.assertEquals("abcd", curAccount);
@@ -47,7 +47,7 @@ public class OrderExecutionTest {
 	}
 
 	@Test
-	public void testOrderExecutionPlaceSellOrder() {
+	public void testOrderExecutionPlaceSellOrder() throws BalanceException {
 		fakeOrder = new Order("abcd", "VND", 1200, 100, Side.SELL);
 		orderExecution.executeOrder(fakeOrder);
 		Assert.assertEquals("SENT", fakeOrder.getStatus());
@@ -57,7 +57,7 @@ public class OrderExecutionTest {
 	}
 
 	@Test
-	public void testOrderExecutionCancelledSellOrder() {
+	public void testOrderExecutionCancelledSellOrder() throws BalanceException {
 		fakeOrder = new Order("abcd", "VND", 1200, 100, Side.SELL);
 		orderExecution.executeCancelledOrder(fakeOrder);
 		Assert.assertEquals("abcd", curAccount);

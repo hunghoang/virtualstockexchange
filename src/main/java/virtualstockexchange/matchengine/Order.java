@@ -151,4 +151,7 @@ public class Order {
 		this.date = date;
 	}
 
+	public static Order getDefaultOrder() {
+		return new Order();
+	}
 }
