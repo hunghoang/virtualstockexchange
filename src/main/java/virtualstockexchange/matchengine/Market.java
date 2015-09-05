@@ -53,7 +53,7 @@ public class Market {
 		if (order.isClosed()) {
 			Order error = Order.getDefaultOrder();
 			error.setStatus("Trang thai order: " + order.getStatus() + " khong phu hop de huy");
-			logger.info("Order status" + error.getStatus() +" is not valid for cancel:");
+			logger.info(error.getStatus());
 			return error;
 		}
 		MatchOrder matchOrder = matchOrderMap.get(order.getSymbol());
