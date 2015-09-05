@@ -47,14 +47,14 @@ public class BalanceController {
 	
 	@RequestMapping(value = "/{account}/next_money/{day}", method = RequestMethod.POST)
 	public List<Balance> nextMoney(@PathVariable("account") String account, @PathVariable("day") int day) throws BalanceException {
-		balanceChecker.nextMoney(account, day);
+		balanceChecker.nextMoney(account);
 		return balanceChecker.getBalances(account);
 	}
 	
 	@RequestMapping(value = "/{account}/next_security/{day}/{symbol}", method = RequestMethod.POST)
 	public List<Balance> nextSecurity(@PathVariable("account") String account, @PathVariable("day") int day, 
 			@PathVariable("symbol") String symbol) throws BalanceException {
-		balanceChecker.nextSecurity(account, day, symbol);
+		balanceChecker.nextSecurity(account, symbol);
 		return balanceChecker.getBalances(account);
 	}
 	
