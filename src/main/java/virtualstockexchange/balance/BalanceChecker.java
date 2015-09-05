@@ -174,11 +174,20 @@ public class BalanceChecker {
 				return balance;
 			}
 		}
-		throw new BalanceException("No balance for: " + symbol + " of "
-				+ account);
+		throw new BalanceException("No balance for: " + symbol + " of " + account);
 	}
 
-	public void switchDay(int day, Balance balance) {
+	public void nextMoney(String account, int day) {
+		Balance balance = getMoneyBalance(account);
+		switchDay(day, balance);
+	}
+	
+	public void nextSecurity(String account, int day, String symbol) throws BalanceException {
+		Balance balance = getSecBalance(account, symbol);
+		switchDay(day, balance);
+	}
+	
+	public void switchDay (int day, Balance balance) {
 		switch (day) {
 		case 0:
 			balance.setT1(balance.getT0());
@@ -211,5 +220,23 @@ public class BalanceChecker {
 
 	public List<Balance> getBalances(String account) {
 		return balanceMap.get(account);
+	}
+	
+	public long getTotalAssets(String account, long price) {
+		Balance moneyBalance = getMoneyBalance(account);
+		long currentMoney = 0;
+		currentMoney += moneyBalance.getAmount() + moneyBalance.getT0() + moneyBalance.getT0()
+				 + moneyBalance.getT1() + moneyBalance.getT2() + moneyBalance.getT3()
+				 -  + moneyBalance.getHold();
+		
+		List<Balance> balances = balanceMap.get(account);
+		for (Balance balance : balances) {
+			if (!balance.getSecCode().equals(null)) {
+				currentMoney += (moneyBalance.getAmount() + moneyBalance.getT0() + moneyBalance.getT0()
+						 + moneyBalance.getT1() + moneyBalance.getT2() + moneyBalance.getT3()
+						 -  + moneyBalance.getHold()) * price;
+			}
+		}
+		return 0;
 	}
 }
