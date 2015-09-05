@@ -37,9 +37,6 @@ public class BalanceChecker {
 			throws BalanceException {
 		if (!isValidAccount(account))
 			throw new BalanceException("Account is not exist: " + account);
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
 		Balance secBalance = new Balance();
 		secBalance.setAmount(quantity);
 		secBalance.setSecCode(symbol);
@@ -98,9 +95,6 @@ public class BalanceChecker {
 		if (!isValidAccount(account))
 			throw new BalanceException("Account is not exist: " + account);
 		Balance secBalance = getSecBalance(account, secCode);
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
 		if (!isEnoughQuantity(quantity, secBalance))
 			throw new BalanceException("Not enough quantity: " + account);
 
@@ -110,9 +104,6 @@ public class BalanceChecker {
 
 	public void addSecurity(String account, String secCode, int quantity)
 			throws BalanceException {
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
 		if (isExistSymbol(account, secCode)) {
 			Balance secBalance = getSecBalance(account, secCode);
 			secBalance.setT0(quantity);
@@ -139,9 +130,6 @@ public class BalanceChecker {
 		if (!isValidAccount(account))
 			throw new BalanceException("Account is not exist: " + account);
 		Balance secBalance = getSecBalance(account, secCode);
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
 		secBalance.setAmount(secBalance.getAmount() + quantity);
 	}
 	
@@ -168,9 +156,6 @@ public class BalanceChecker {
 
 	private boolean isEnoughQuantity(int quantity, Balance secBalance)
 			throws BalanceException {
-		if (quantity <= 0)
-			throw new BalanceException("Quantity smaller than 0 or equal 0: "
-					+ quantity);
 		if (secBalance.getAmount() >= quantity)
 			return true;
 		return false;
