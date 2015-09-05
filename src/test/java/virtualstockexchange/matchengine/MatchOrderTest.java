@@ -1,9 +1,8 @@
-package virtualstockexchange;
+package virtualstockexchange.matchengine;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ public class MatchOrderTest {
 
 	@Before
 	public void setUp() {
-		matchOrder = new MatchOrder();
+		matchOrder = new MatchOrder(new OrderCleaner());
 	}
 
 	@Test
@@ -78,6 +77,27 @@ public class MatchOrderTest {
 		Assert.assertEquals(300, orders2.get(0).getMatchQuantity());
 		Assert.assertEquals(12200, orders2.get(1).getMatchPrice());
 		Assert.assertEquals(300, orders2.get(1).getMatchQuantity());
+	}
+
+	@Test
+	public void testMatchOrderPartialFillAndFill() {
+		List<Order> orders1 = matchOrder.match(new Order("VND", 12300, 3000,
+				Side.BUY));
+		List<Order> orders2 = matchOrder.match(new Order("VND", 12200, 1000,
+				Side.SELL));
+		Assert.assertEquals(0, orders1.size());
+		Assert.assertEquals(2, orders2.size());
+		Assert.assertEquals(12200, orders2.get(0).getMatchPrice());
+		Assert.assertEquals(1000, orders2.get(0).getMatchQuantity());
+		Assert.assertEquals(12200, orders2.get(1).getMatchPrice());
+		Assert.assertEquals(1000, orders2.get(1).getMatchQuantity());
+		List<Order> orders3 = matchOrder.match(new Order("VND", 12200, 2500,
+				Side.SELL));
+		Assert.assertEquals(2, orders3.size());
+		Assert.assertEquals(12200, orders3.get(0).getMatchPrice());
+		Assert.assertEquals(3000, orders3.get(0).getMatchQuantity());
+		Assert.assertEquals(12200, orders3.get(1).getMatchPrice());
+		Assert.assertEquals(2000, orders3.get(1).getMatchQuantity());
 	}
 
 	@Test

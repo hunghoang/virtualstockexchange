@@ -1,4 +1,4 @@
-package virtualstockexchange;
+package virtualstockexchange.matchengine;
 
 public class Side {
 
