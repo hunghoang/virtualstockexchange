@@ -108,16 +108,6 @@ public class BalanceCheckerTest {
 		checker.holdSecurity("abc", "VND", 12000);
 	}
 	
-	@Test (expected = BalanceException.class)
-	public void throwsExceptionWhenHoldSecurityQuantitySmallerThan0() throws BalanceException {
-		secBalance.setSecCode("VND");
-		secBalance.setAmount(1000);
-		balances.add(secBalance);
-		balanceMap.put("abc", balances);
-		
-		checker.holdSecurity("abc", "VND", -12000);
-	}
-	
 	@Test
 	public void testAddSecurity() throws BalanceException {
 		secBalance.setSecCode("VND");
@@ -150,21 +140,6 @@ public class BalanceCheckerTest {
 		Assert.assertEquals(200, testSecBalance.getT0());
 		Assert.assertEquals(300, testSecBalance1.getT0());
 	}
-	
-	@Test (expected = BalanceException.class)
-	public void throwsExceptionWhenAddSecurityQuantitySmallerThan0() throws BalanceException {
-		secBalance.setSecCode("VND");
-		secBalance.setAmount(1000);
-		
-		balances.add(secBalance);
-		balanceMap.put("abc", balances);
-		
-		checker.addSecurity("abc", "VND", -200);
-		checker.addSecurity("abc", "VND", 300);
-		checker.addSecurity("abc", "VND", 300);
-	}
-	
-
 	
 	@Test
 	public void testAddMoney() throws BalanceException {
