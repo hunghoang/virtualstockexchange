@@ -129,20 +129,20 @@ public class MatchOrder {
 		sellOrders.add(order);
 	}
 
-	protected List<Order> getBuys() {
-		return buyOrders;
-	}
-
-	protected List<Order> getSells() {
-		return sellOrders;
-	}
-
 	public void remove(Order order) {
 		if (order.getSide() == Side.BUY) {
 			buyOrders.remove(order);
 		} else {
 			sellOrders.remove(order);
 		}
+	}
+	
+	protected List<Order> getBuys() {
+		return buyOrders;
+	}
+	
+	protected List<Order> getSells() {
+		return sellOrders;
 	}
 
 }
