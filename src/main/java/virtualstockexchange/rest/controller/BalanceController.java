@@ -59,10 +59,9 @@ public class BalanceController {
 	}
 	
 	@RequestMapping(value = "/{account}/total_assets/", method = RequestMethod.GET)
-	public List<Balance> getTotalAssets(@PathVariable("account") String account) throws BalanceException {
-		balanceChecker.getTotalAssets(account);
-		return balanceChecker.getBalances(account);
-	}
+	public long getTotalAssets(@PathVariable("account") String account) throws BalanceException {
+		return balanceChecker.getTotalAssets(account);	
+		}
 	
 
 }

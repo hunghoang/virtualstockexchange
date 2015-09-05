@@ -213,4 +213,10 @@ public class BalanceCheckerTest {
 		Balance testBalance = checker.getMoneyBalance(testBalances);
 		Assert.assertEquals(50000000, testBalance.getAmount());
 	}
+	
+	@Test
+	public void testGetTotalAsset(){
+		long totalAssets = checker.getTotalAssets("ha_nguyen");
+		Assert.assertEquals(50000000, totalAssets);
+	}
 }
