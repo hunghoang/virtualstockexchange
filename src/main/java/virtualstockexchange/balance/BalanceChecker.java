@@ -226,8 +226,7 @@ public class BalanceChecker {
 
 		for (Balance balance : balances) {
 			if (balance.getSecCode() != null) {
-				long price = priceService.getPrice(balance.getSecCode());
-				currentMoney += (balance.getAmount() + balance.getT0() + balance.getT0()  + balance.getT1() + balance.getT2() - balance.getHold()) * price;
+				currentMoney += (balance.getAmount() + balance.getT0() + balance.getT0()  + balance.getT1() + balance.getT2() - balance.getHold()) * priceService.getPrice(balance.getSecCode());
 			}
 		}
 		return currentMoney;
