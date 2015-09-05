@@ -24,7 +24,7 @@ public class BalanceChecker {
 	}
 
 	public void initBalanceMap() throws BalanceException {
-		String user1 = "ha.nguyen";
+		String user1 = "ha_nguyen";
 		initAccount(user1);
 		Balance secBalance1 = initSecBalance(user1, "VND", 2000);
 		Balance secBalance2 = initSecBalance(user1, "SSI", 5000);
@@ -36,7 +36,7 @@ public class BalanceChecker {
 		user1Balances.add(secBalance3);
 		balanceMap.put(user1, user1Balances);
 
-		String user2 = "giang.vu";
+		String user2 = "giang_vu";
 		initAccount(user2);
 		List<Balance> user2Balances = balanceMap.get(user2);
 		Balance secBalance4 = initSecBalance(user2, "VND", 3000);

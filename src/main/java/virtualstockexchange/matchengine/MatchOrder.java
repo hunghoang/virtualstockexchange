@@ -21,16 +21,14 @@ public class MatchOrder {
 		if (side == Side.BUY) {
 			for (Order sell : sellOrders) {
 				if (price >= sell.getPrice()) {
-					match(order, sell);
-					results.add(sell);
+					matchSell(results, order, sell);
 				}
 			}
 			orderCleaner.clearOrder(sellOrders);
 		} else {
 			for (Order buy : buyOrders) {
 				if (price <= buy.getPrice()) {
-					match(buy, order);
-					results.add(buy);
+					matchBuy(results, buy, order);
 				}
 			}
 			orderCleaner.clearOrder(buyOrders);
@@ -47,14 +45,36 @@ public class MatchOrder {
 		return results;
 	}
 
+
+	private void matchSell(List<Order> results, Order buy, Order sell) {
+		int matchQuantity = getMatchQuantity(buy, sell);
+		if (matchQuantity > 0) {
+			match(buy, sell, matchQuantity);
+			results.add(sell);
+		}
+		
+	}
+
+	private int getMatchQuantity(Order buy, Order sell) {
+		return buy.getRemainQuantity() >= sell.getRemainQuantity() ? sell
+				.getRemainQuantity() : buy.getRemainQuantity();
+	}
+
 	private boolean isMatch(List<Order> results) {
 		return results.size() > 0;
 	}
+	
+	private void matchBuy(List<Order> results, Order buy, Order sell) {
+		int matchQuantity = getMatchQuantity(buy, sell);
+		if (matchQuantity > 0) {
+			match(buy, sell, matchQuantity);
+			results.add(buy);
+		}
+		
+	}
 
-	private void match(Order buy, Order sell) {
+	private void match(Order buy, Order sell, int matchQuantity) {
 		long matchPrice = sell.getPrice();
-		int matchQuantity = buy.getRemainQuantity() >= sell.getRemainQuantity() ? sell
-				.getRemainQuantity() : buy.getRemainQuantity();
 		buy.setMatch(matchPrice, matchQuantity);
 		sell.setMatch(matchPrice, matchQuantity);
 	}

@@ -1,12 +1,15 @@
 package virtualstockexchange.rest.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import virtualstockexchange.balance.BalanceException;
@@ -30,15 +33,15 @@ public class AccountOrderController {
 	}
 
 
-	@RequestMapping(value = "/{accountNumber}/orders/new_order_requests", method = RequestMethod.POST)
+	@RequestMapping(value = "/{account}/orders/new_order_requests", method = RequestMethod.POST)
 	public Order placeOrder(@RequestBody NewOrderRequest orderRequest,
-			@PathVariable("accountNumber") String accountNumber) {
-		System.out.println("Place order " + orderRequest + " for account: " + accountNumber);
+			@PathVariable("account") String account) {
+		System.out.println("Place order " + orderRequest + " for account: " + account);
 		int side = Side.BUY;
-		if (orderRequest.getSide() == "NS") {
+		if (orderRequest.getSide().equals("NS")) {
 			side = Side.SELL;
 		}
-		Order order = new Order(accountNumber, orderRequest.getSymbol(),
+		Order order = new Order(account, orderRequest.getSymbol(),
 				orderRequest.getPrice(), orderRequest.getQuantity(), side);
 		String orderId = order.getOrderId();
 		List<Order> orders;
@@ -58,9 +61,9 @@ public class AccountOrderController {
 		return order;
 	}
 	
-	@RequestMapping(value = "/{accountNumber}/orders/{orderid}", method = RequestMethod.DELETE)
-	public Order cancel(@PathVariable("accountNumber") String accountNumber, @PathVariable("orderid") String orderId) {
-		System.out.println("cancel order for account: " + accountNumber + " with orderid " + orderId);
+	@RequestMapping(value = "/{account}/orders/{orderid}", method = RequestMethod.DELETE)
+	public Order cancel(@PathVariable("account") String account, @PathVariable("orderid") String orderId) {
+		System.out.println("cancel order for account: " + account + " with orderid " + orderId);
 		Order order = new Order("", 0, 0 ,0);
 		order.setOrderId(orderId);
 		try {
@@ -70,5 +73,18 @@ public class AccountOrderController {
 			error.setStatus("Co loi khi dat lenh");
 			return error;
 		}
+	}
+	
+	@RequestMapping(value = "/{account}/orders", method = RequestMethod.GET)
+	public @ResponseBody List<Order> getOrders(@PathVariable String account,
+			ModelMap model) {
+		List<Order> results = new ArrayList<Order>();
+		List<Order> orders = market.getAllOrders();
+		for (Order order : orders) {
+			if (order.getAccount().equals(account)) {
+				results.add(order);
+			}
+		}
+		return results;
 	}
 }

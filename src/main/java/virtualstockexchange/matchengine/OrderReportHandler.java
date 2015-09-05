@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import virtualstockexchange.balance.BalanceException;
 import virtualstockexchange.websocket.config.NotifyWebSocketHandler;
 
 @Component
@@ -19,11 +20,12 @@ public class OrderReportHandler {
 	
 	private BlockingQueue<Order> queue = new LinkedBlockingQueue<Order>();
 	
+	private OrderExecution orderExecution;
 	
 	@Autowired
-	public OrderReportHandler(final NotifyWebSocketHandler notifyWebSocketHandler) {
+	public OrderReportHandler(final NotifyWebSocketHandler notifyWebSocketHandler, OrderExecution orderExecution) {
 		logger.info("Noti:" + notifyWebSocketHandler);
-		System.out.println("hello");
+		this.orderExecution = orderExecution; 
 		new Thread() {
 			@Override
 			public void run() {
@@ -41,10 +43,16 @@ public class OrderReportHandler {
 	}
 	
 	public void update(List<Order> orders) {
+		try {
+			orderExecution.fillOrder(orders);
+		} catch (BalanceException e) {
+			logger.error("Error when fill order", e);
+		}
 		for (Order order : orders) {
 			if (order.getAccount() != null) {
 				logger.info("report for real order: " + order);
 				try {
+					
 					queue.put(order);
 				} catch (InterruptedException e) {
 					logger.error("Interrupted", e);
