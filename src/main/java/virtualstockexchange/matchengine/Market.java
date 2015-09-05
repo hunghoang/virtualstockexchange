@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class Market {
 
+	private static final Logger logger = Logger.getLogger(Market.class);
+	
 	private Map<String, Order> historyOrders = new HashMap<String, Order>();
 	private Map<String, Order> orders = new HashMap<String, Order>();
 	private Map<String, MatchOrder> matchOrderMap = new HashMap<String, MatchOrder>();
@@ -36,10 +39,16 @@ public class Market {
 	public Order cancel(String orderId) {
 		Order order = orders.remove(orderId);
 		if (order == null) {
-			throw new RuntimeException("Not found order: " + orderId);
+			Order error = Order.getDefaultOrder();
+			error.setStatus("Khong tim thay order: " + orderId);
+			logger.info(error.getStatus());
+			return error;
 		}
 		if (order.isClosed()) {
-			throw new RuntimeException("Order status" + order.getStatus() +" is not valid for cancel:");	
+			Order error = Order.getDefaultOrder();
+			error.setStatus("Trang thai order: " + order.getStatus() + " khong phu hop de huy");
+			logger.info("Order status" + error.getStatus() +" is not valid for cancel:");
+			return error;
 		}
 		MatchOrder matchOrder = matchOrderMap.get(order.getSymbol());
 		matchOrder.remove(order);
