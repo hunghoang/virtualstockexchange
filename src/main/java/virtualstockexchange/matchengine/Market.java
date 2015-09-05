@@ -31,9 +31,15 @@ public class Market {
 			matchOrderMap.put(order.getSymbol(), matchOrder);
 		}
 		orders.put(order.getOrderId(), order);
-		historyOrders.put(order.getOrderId(), order);
+		updateHistory(order);
 		order.setStatus("SENT");
 		return matchOrder.match(order);
+	}
+
+	private void updateHistory(Order order) {
+		if (order.getAccount() != null) {
+			historyOrders.put(order.getOrderId(), order);
+		}
 	}
 
 	public Order cancel(String orderId) {

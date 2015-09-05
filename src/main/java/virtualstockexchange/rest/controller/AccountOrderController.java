@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import virtualstockexchange.balance.BalanceException;
@@ -30,10 +29,6 @@ public class AccountOrderController {
 		this.orderExecution = orderExecution;
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public @ResponseBody List<Order> getOrders() {
-		return market.getAllOrders();
-	}
 
 	@RequestMapping(value = "/{accountNumber}/orders/new_order_requests", method = RequestMethod.POST)
 	public Order placeOrder(@RequestBody NewOrderRequest orderRequest,

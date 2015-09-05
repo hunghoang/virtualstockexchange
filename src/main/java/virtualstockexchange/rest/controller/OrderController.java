@@ -1,5 +1,6 @@
 package virtualstockexchange.rest.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,22 @@ public class OrderController {
 		return market.getAllOrders();
 	}
 
+	@RequestMapping(value = "/{accountNumber}", method = RequestMethod.GET)
+	public @ResponseBody List<Order> getOrders(@PathVariable String accountNumber,
+			ModelMap model) {
+		List<Order> results = new ArrayList<Order>();
+		List<Order> orders = market.getAllOrders();
+		for (Order order : orders) {
+			if (order.getAccount().equals(accountNumber)) {
+				results.add(order);
+			}
+		}
+		return results;
+	}
+	
 	@RequestMapping(value = "/{orderid}", method = RequestMethod.GET)
 	public @ResponseBody Object getOrder(@PathVariable String orderid,
 			ModelMap model) {
-		System.out.println(orderid);
 		List<Order> orders = market.getAllOrders();
 		for (Order order : orders) {
 			if (order.getOrderId().equals(orderid)) {
