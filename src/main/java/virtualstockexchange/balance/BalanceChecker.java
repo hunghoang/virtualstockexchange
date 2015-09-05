@@ -217,7 +217,7 @@ public class BalanceChecker {
 	public long getTotalAssets(String account) {
 		Balance moneyBalance = getMoneyBalance(account);
 		long currentMoney = 0;
-		currentMoney += moneyBalance.getAmount() + moneyBalance.getT0() + moneyBalance.getT0()
+		currentMoney += moneyBalance.getAmount() + moneyBalance.getT0()
 				 + moneyBalance.getT1() + moneyBalance.getT2()
 				 - moneyBalance.getHold();
 		
@@ -226,7 +226,7 @@ public class BalanceChecker {
 
 		for (Balance balance : balances) {
 			if (balance.getSecCode() != null) {
-				currentMoney += (balance.getAmount() + balance.getT0() + balance.getT0()  + balance.getT1() + balance.getT2() - balance.getHold()) * priceService.getPrice(balance.getSecCode());
+				currentMoney += (balance.getAmount() + balance.getT0() + balance.getT1() + balance.getT2() - balance.getHold()) * priceService.getPrice(balance.getSecCode());
 			}
 		}
 		return currentMoney;
