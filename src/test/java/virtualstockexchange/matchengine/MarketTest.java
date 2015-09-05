@@ -39,7 +39,7 @@ public class MarketTest {
 		market.place(order);
 		String orderId = order.getOrderId();
 		market.cancel(orderId);
-		Assert.assertEquals(0, market.getAllOrders().size());
+		Assert.assertEquals(1, market.getAllOrders().size());
 		MatchOrder matchOrder = market.getMatchOrder("VND");
 		Assert.assertEquals(0, matchOrder.getBuys().size());
 		Assert.assertEquals("CANCELLED", order.getStatus());
@@ -51,7 +51,7 @@ public class MarketTest {
 		market.place(order);
 		String orderId = order.getOrderId();
 		market.cancel(orderId);
-		Assert.assertEquals(0, market.getAllOrders().size());
+		Assert.assertEquals(1, market.getAllOrders().size());
 		MatchOrder matchOrder = market.getMatchOrder("VND");
 		Assert.assertEquals(0, matchOrder.getBuys().size());
 		Assert.assertEquals("CANCELLED", order.getStatus());
