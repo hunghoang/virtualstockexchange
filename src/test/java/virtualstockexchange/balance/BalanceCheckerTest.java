@@ -226,7 +226,6 @@ public class BalanceCheckerTest {
 		checker.nextSecurity("abc", "VND");
 		checker.nextSecurity("abc", "VND");
 		checker.nextSecurity("abc", "VND");
-//		checker.nextSecurity("abc", "VND");
 		
 		Balance testBalance = checker.getSecBalance("abc", "VND");
 		Assert.assertEquals(0, testBalance.getT0());

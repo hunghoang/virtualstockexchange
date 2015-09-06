@@ -228,15 +228,17 @@ public class BalanceChecker {
 	}
 	
 	public void switchDay (Balance balance) {
+		if (balance.getT2() > 0) {
+			balance.setAmount(balance.getAmount() + balance.getT2());
+			balance.setT2(0);
+		}
+		if (balance.getT1() > 0) {
+			balance.setT2(balance.getT1());
+			balance.setT1(0);
+		}
 		if (balance.getT0() > 0) {
 			balance.setT1(balance.getT0());
 			balance.setT0(-(balance.getT0()));
-		} else if (balance.getT1() > 0) {
-			balance.setT2(balance.getT1());
-			balance.setT1(0);
-		} else if (balance.getT2() > 0) {
-			balance.setAmount(balance.getAmount() + balance.getT2());
-			balance.setT2(0);
 		}
 	}
 }
