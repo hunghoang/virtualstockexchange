@@ -12,7 +12,7 @@ public class SystemException extends Exception {
 		this.message = null;
 	}
 	
-	public SystemException(String message, String code) {
+	public SystemException(String code, String message) {
 		super();
 		this.code = code;
 		this.message = message;

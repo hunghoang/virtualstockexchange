@@ -1,10 +1,15 @@
 package virtualstockexchange.balance;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import virtualstockexchange.exception.ExceptionCode;
 import virtualstockexchange.exception.SystemException;
@@ -14,19 +19,18 @@ public class AssetTest {
 	private Asset asset = new Asset();
 	
 	@Test
-	public void testInitMoney() {
+	public void testInitMoney() throws SystemException {
 		verifyInitMoneyForAccount(10000000);
-		verifyInitMoneyForAccount(11000000);
 	}
 
-	private void verifyInitMoneyForAccount(long expectedMoney) {
+	private void verifyInitMoneyForAccount(long expectedMoney) throws SystemException {
 		asset.initMoneyForAccount("1234", expectedMoney);
 		long moneyOfAccount = asset.getMoneyByAccount("1234");
 		assertEquals(expectedMoney, moneyOfAccount);
 	}
 
-	@Test
-	public void testDuplicateInitMoney() {
+	@Test(expected=RuntimeException.class)
+	public void testDuplicateInitMoney() throws SystemException {
 		asset.initMoneyForAccount("1234", 1000);
 		asset.initMoneyForAccount("1234", 2000);
 		long moneyOfAccount = asset.getMoneyByAccount("1234");
@@ -34,7 +38,7 @@ public class AssetTest {
 	}
 	
 	@Test
-	public void testInitMoneyForManyAccountShouldSetMoneyForRightAccount() {
+	public void testInitMoneyForManyAccountShouldSetMoneyForRightAccount() throws SystemException {
 		long expectedMoneyOfAcc1 = 1000;
 		long expectedMoneyOfAcc2 = 2000;
 		asset.initMoneyForAccount("1234", expectedMoneyOfAcc1);
@@ -55,11 +59,16 @@ public class AssetTest {
 		assertEquals(moneyBeforeHold, money + hold);
 	}
 	
-	@Test(expected = Exception.class)
-	public void testHoldMoneyWithHoldMoneyBiggerThanCurrentMoney() throws Exception {
+	@Test
+	public void testHoldMoneyWithHoldMoneyBiggerThanCurrentMoney() throws SystemException {
 		asset.initMoneyForAccount("1234", 2500);
 		long hold = 3000;
-		asset.holdMoney("1234", hold);
+        try {
+    		asset.holdMoney("1234", hold);
+        	fail("Should throw");
+        } catch(SystemException e) {
+			Assert.assertEquals(ExceptionCode.MONEY_NOT_ENOUGH.code(), e.getCode());
+        }
 	}
 	
 	@Test
@@ -74,27 +83,37 @@ public class AssetTest {
 		assertEquals(0, moneyBeforeHold - hold);
 	}
 	
-	@Test(expected = Exception.class)
-	public void testHoldMoneyWithWrongAccountShouldFail() throws Exception {
+	@Test
+	public void testHoldMoneyWithWrongAccountShouldFail() throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
 		long hold = 1500;
-		asset.holdMoney("8989", hold);
+        try {
+        	asset.holdMoney("8989", hold);
+        	fail("Should throw");
+        } catch(SystemException e) {
+			Assert.assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+        }
 	}
 	
-	@Test(expected = Exception.class)
-	public void testHoldMoneyWithHoldMoneyTwiceTimeBiggerThanCurrentMoney () throws Exception {
+	@Test
+	public void testHoldMoneyWithHoldMoneyTwiceTimeBiggerThanCurrentMoney () throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
 		long hold1 = 1000;
 		long hold2 = 2000;
-		asset.holdMoney("1234", hold1);
-		asset.holdMoney("1234", hold2);
+        try {
+    		asset.holdMoney("1234", hold1);
+    		asset.holdMoney("1234", hold2);
+    		fail("Should throw");
+        } catch(SystemException e) {
+			Assert.assertEquals(ExceptionCode.MONEY_NOT_ENOUGH.code(), e.getCode());
+        }
 	}
 	
 	
 	@Test
-	public void testUnHoldMoneyShouldRunRight () {
+	public void testUnHoldMoneyShouldRunRight () throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
 		long moneyBeforeUnHold = asset.getMoneyByAccount("1234");
@@ -103,17 +122,22 @@ public class AssetTest {
 		assertEquals(asset.getMoneyByAccount("1234"), unHoldMoney+moneyBeforeUnHold);
 	}
 	
-	@Test(expected = Exception.class)
-	public void testUnHoldMoneyWithAccountNotExistShouldFail() {
+	@Test
+	public void testUnHoldMoneyWithAccountNotExistShouldFail() throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
 
 		long unHoldMoney = 1000;
-		asset.unHoldMoney("8989", unHoldMoney);
+        try {
+    		asset.unHoldMoney("8989", unHoldMoney);
+        	fail("Should throw");
+        } catch(SystemException e) {
+			Assert.assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+        }
 	}
 	
 	@Test
-	public void testAddMoneyShouldRight() {
+	public void testAddMoneyShouldRight() throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
 
@@ -123,35 +147,45 @@ public class AssetTest {
 		assertEquals(asset.getMoneyByAccount("1234"), moneyBeforeAdd + addMoney);
 	}
 	
-	@Test(expected = Exception.class)
-	public void testAddMoneyWithAccountNotExistShouldFail() {
+	@Test
+	public void testAddMoneyWithAccountNotExistShouldFail() throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
-
 		long addMoney = 1000;
-		asset.addMoney("8989", addMoney);
+        try {
+    		asset.addMoney("8989", addMoney);
+        	fail("Should throw");
+        } catch(SystemException e) {
+        	assertTrue(true);
+			Assert.assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+        }
 	}
 	
 	@Test
 	public void testAddSecurities () throws Exception {
 		String secCode = "ACB";
 		int quantity = 200;
-		
+		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode, quantity);
 		
-		List<Securities> secBalanceList = asset.getAllSecuritiesByAccount("1234");
-		String secResult = "null";
-		for (Securities secBalance : secBalanceList) {
+		List<Security> secBalanceList = asset.getAllSecuritiesByAccount("1234");
+		String secResult = "";
+		for (Security secBalance : secBalanceList) {
 			if (secBalance.getSecCode().equals(secCode))
 				secResult = secBalance.getSecCode();
 		}
-		
-		assertEquals(true, asset.accIsExistSecCode("1234", "ACB"));
-		assertEquals(false, asset.accIsExistSecCode("1234", "VND"));
-		assertEquals(false, asset.accIsExistSecCode("1234", "ACBD"));
 		assertEquals(secCode, secResult);
 		assertEquals(quantity, asset.getQuantitySecByAccount("1234", "ACB"));
+	}
+	
+	@Test
+	public void testGetQuantitySecByAccountShouldRunRight() throws Exception {
 		try {
+			String secCode = "ACB";
+			int quantity = 200;
+			asset.initMoneyForAccount("1234", 0);
+			asset.addSecurity("1234", secCode, quantity);
+			assertEquals(quantity, asset.getQuantitySecByAccount("1234", "ACB"));
 			asset.getQuantitySecByAccount("1234", "ACBB");
 		} catch (SystemException e) {
 			assertEquals(ExceptionCode.SEC_CODE_NOT_EXIST.code(), e.getCode());
@@ -159,16 +193,28 @@ public class AssetTest {
 	}
 	
 	@Test
+	public void testAccIsExistSecCodeShoudRunRight () throws Exception {
+		String secCode = "ACB";
+		int quantity = 200;
+		asset.initMoneyForAccount("1234", 0);
+		asset.addSecurity("1234", secCode, quantity);
+		assertEquals(true, asset.accIsExistSecCode("1234", "ACB"));
+		assertEquals(false, asset.accIsExistSecCode("1234", "VND"));
+		assertEquals(false, asset.accIsExistSecCode("1234", "ACBD"));
+	}
+	
+	@Test
 	public void testAddSecuritiesWithListSec() throws Exception {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
+		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode1, quantity1);
 		
 		String secCode2 = "VND";
 		int quantity2 = 500;
 		asset.addSecurity("1234", secCode2, quantity2);
 		
-		List<Securities> secBalanceList = asset.getAllSecuritiesByAccount("1234");
+		List<Security> secBalanceList = asset.getAllSecuritiesByAccount("1234");
 		assertEquals(2, secBalanceList.size());
 		assertEquals(true, asset.accIsExistSecCode("1234", "ACB"));
 		assertEquals(true, asset.accIsExistSecCode("1234", "VND"));
@@ -181,6 +227,7 @@ public class AssetTest {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
+		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode1, quantity1);
 		asset.addSecurity("1234", secCode1, quantityNew);
 		
@@ -188,7 +235,7 @@ public class AssetTest {
 		int quantity2 = 500;
 		asset.addSecurity("1234", secCode2, quantity2);
 		
-		List<Securities> secBalanceList = asset.getAllSecuritiesByAccount("1234");
+		List<Security> secBalanceList = asset.getAllSecuritiesByAccount("1234");
 		assertEquals(2, secBalanceList.size());
 		assertEquals(quantity1 + quantityNew, asset.getQuantitySecByAccount("1234", "ACB"));
 		assertEquals(quantity2, asset.getQuantitySecByAccount("1234", "VND"));
@@ -198,18 +245,19 @@ public class AssetTest {
 	public void testAddSecurityWithAccountNotInitMoneyYet () throws Exception {
 		String secCode2 = "VND";
 		int quantity2 = 500;
-		asset.addSecurity("2222", secCode2, quantity2);
-		List<Securities> secBalanceList = asset.getAllSecuritiesByAccount("2222");
-		assertEquals(1, secBalanceList.size());
-		assertEquals(quantity2, asset.getQuantitySecByAccount("2222", "VND"));
-		assertEquals(true, asset.accIsExistSecCode("2222", "VND"));
+		try {
+			asset.addSecurity("2222", secCode2, quantity2);
+		} catch (SystemException e) {
+			assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+		}
 	}
 	
 	@Test
-	public void testHoldSecurityShouldRunRight() throws Exception {
+	public void testHoldSecurityShouldRunRight() throws Exception, SystemException {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
+		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode1, quantity1);
 		asset.addSecurity("1234", secCode1, quantityNew);
 		
@@ -237,19 +285,26 @@ public class AssetTest {
 		assertEquals(250, asset.getQuantitySecByAccount("1234", "ACB"));
 	}
 	
-	@Test(expected=SystemException.class)
-	public void testHoldSecurityWithAccountNotExist() throws Exception {
+	@Test
+	public void testHoldSecurityWithAccountNotExist() throws Exception, SystemException {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
-		asset.addSecurity("1234", secCode1, quantity1);
-		asset.addSecurity("1234", secCode1, quantityNew);
+
 		
-		String secCode2 = "VND";
-		int quantity2 = 500;
-		asset.addSecurity("1234", secCode2, quantity2);
-		
-		asset.holdSecurity("22222", "ACB", 100);
+        try {
+    		asset.addSecurity("1234", secCode1, quantity1);
+    		asset.addSecurity("1234", secCode1, quantityNew);
+    		
+    		String secCode2 = "VND";
+    		int quantity2 = 500;
+    		asset.addSecurity("1234", secCode2, quantity2);
+    		asset.holdSecurity("22222", "ACB", 100);
+        	fail("Should throw");
+        } catch(SystemException e) {
+        	assertTrue(true);
+			Assert.assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+        }
 	}
 	
 	@Test
@@ -257,6 +312,7 @@ public class AssetTest {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
+		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode1, quantity1);
 		asset.addSecurity("1234", secCode1, quantityNew);
 		
@@ -270,11 +326,13 @@ public class AssetTest {
 		assertEquals(asset.getQuantitySecByAccount("1234", secCode1), quantity1+quantityNew+unHoldQuantity);
 	}
 	
-	@Test(expected=SystemException.class)
-	public void testUnHoldSecurityWithAccountNotExistShouldFail() throws Exception {
+	@Test
+	public void testUnHoldSecurityWithAccountNotExistShouldFail() throws Exception, SystemException {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
+		asset.initMoneyForAccount("1234", 0);
+
 		asset.addSecurity("1234", secCode1, quantity1);
 		asset.addSecurity("1234", secCode1, quantityNew);
 		
@@ -283,8 +341,32 @@ public class AssetTest {
 		asset.addSecurity("1234", secCode2, quantity2);
 		
 		int unHoldQuantity = 100;
-		asset.unHoldSecurity("2222", "ACB", unHoldQuantity);
+        try {
+    		asset.unHoldSecurity("2222", "ACB", unHoldQuantity);
+        	fail("Should throw");
+        } catch(SystemException e) {
+			Assert.assertEquals(ExceptionCode.ACCOUNT_NOT_EXIST.code(), e.getCode());
+        }
 	}
+	
+//	@Test
+//	public void testSecurityNextDayShouldRunRight () throws Exception {
+//		String secCode1 = "ACB";
+//		int quantity1 = 200;
+//		String secCode2 = "VND";
+//		int quantity2 = 150;
+//		asset.initMoneyForAccount("1234", 0);
+//		asset.addSecurity("1234", secCode1, quantity1);
+//		asset.addSecurity("1234", secCode2, quantity2);
+//		
+//		asset.nextDay("1234", secCode1);
+//		asset.nextDay("1234", secCode1);
+//		asset.nextDay("1234", secCode1);
+//		Security security = asset.getSecurity("1234", secCode1);
+//		assertEquals(quantity1, security.getQuantity());
+//		
+//	}
+	
 	//TODO : add test getAllSecuritiesByAccount, getMoneyByAccount together shoud right
 
 }

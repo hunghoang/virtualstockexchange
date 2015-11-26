@@ -37,7 +37,7 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>vn.com.vndirect.priceservice</groupId>
 			<artifactId>datamodel</artifactId>
