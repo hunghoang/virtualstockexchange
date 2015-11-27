@@ -142,19 +142,17 @@ public class Asset {
 		if (!accIsExistSecCode(account, secCode)) 
 			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
 		Security security = getSecurity(account, secCode);
-		if (security.getT2() > 0) {
-			security.setT1(security.getT2());
-			security.setT2(0);
-		}
-		
+		if (security.getT0() > 0) {
+			security.setQuantity(security.getT0());
+			security.setT0(0);
+		}		
 		if (security.getT1() > 0) {
 			security.setT0(security.getT1());
 			security.setT1(0);
 		}
-		
-		if (security.getT0() > 0) {
-			security.setQuantity(security.getT0());
-			security.setT0(0);
+		if (security.getT2() > 0) {
+			security.setT1(security.getT2());
+			security.setT2(0);
 		}
 	}
 	

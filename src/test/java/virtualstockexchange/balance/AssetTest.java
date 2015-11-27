@@ -385,21 +385,46 @@ public class AssetTest {
         }
 	}
 	
-//	@Test
-//	public void testSecurityNextDayShouldRunRight () throws Exception {
-//		String secCode1 = "ACB";
-//		int quantity1 = 200;
-//		String secCode2 = "VND";
-//		int quantity2 = 150;
-//		asset.initMoneyForAccount("1234", 0);
-//		asset.addSecurity("1234", secCode1, quantity1);
+	@Test
+	public void testSecurityNextDayShouldRunRight () throws Exception {
+		String secCode1 = "ACB";
+		int quantity1 = 200;
+		String secCode2 = "VND";
+		int quantity2 = 150;
+		asset.initMoneyForAccount("1234", 0);
+		//ong nay mua vao, ko quan tam hold
+		//T2 = quantity đặt mua
+		asset.addSecurity("1234", secCode1, quantity1);
 //		asset.addSecurity("1234", secCode2, quantity2);
-//		
-//		asset.nextDay("1234", secCode1);
-//		Security security = asset.getSecurity("1234", secCode1);
-//		assertEquals(quantity1, security.getQuantity());
-//		
-//	}
+		
+		//sau khi chuyen ngay moi t1 = quantity mua, t2=0
+		asset.nextDay("1234", secCode1);
+		Security security = asset.getSecurity("1234", secCode1);
+		assertEquals(quantity1, security.getT1());
+		assertEquals(0, security.getT2());
+		assertEquals(0, security.getT0());
+		assertEquals(0, security.getQuantity());
+		
+	}
+	
+	@Test
+	public void testSecurityNextThreeDayShouldRunRight () throws Exception {
+		String secCode1 = "ACB";
+		int quantity1 = 200;
+		
+		asset.initMoneyForAccount("1234", 0);
+		asset.addSecurity("1234", secCode1, quantity1);
+		
+		//sau khi chuyen ngay moi t1 = quantity mua, t2=0
+		asset.nextDay("1234", secCode1);
+		asset.nextDay("1234", secCode1);
+		asset.nextDay("1234", secCode1);
+		Security security = asset.getSecurity("1234", secCode1);
+		assertEquals(0, security.getT1());
+		assertEquals(0, security.getT2());
+		assertEquals(0, security.getT0());
+		assertEquals(quantity1, security.getQuantity());
+	}
 	
 	//TODO : add test getAllSecuritiesByAccount, getMoneyByAccount together shoud right
 
