@@ -3,6 +3,7 @@ package virtualstockexchange.balance;
 public class Security {
 	String secCode;
 	int quantity;
+	int hold;
 	int t0;
 	int t1;
 	int t2;
@@ -36,5 +37,12 @@ public class Security {
 	}
 	public void setT2(int t2) {
 		this.t2 = t2;
-	}	
+	}
+	public int getHold() {
+		return hold;
+	}
+	public void setHold(int hold) {
+		this.hold = hold;
+	}
+	
 }

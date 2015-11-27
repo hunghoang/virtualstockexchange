@@ -1,7 +1,6 @@
 package virtualstockexchange.balance;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,11 +57,11 @@ public class Asset {
 		//FIXME: add duplicate secCode shoud add more quantity
 		if (accIsExistSecCode(account, secCode)) {
 			Security secBalance = getSecurity(account, secCode);
-			secBalance.setQuantity(quantity+secBalance.getQuantity());
+			secBalance.setT2(quantity+secBalance.getT2());
 		} else {
 			Security newBalance = new Security();
 			newBalance.setSecCode(secCode);
-			newBalance.setQuantity(quantity);
+			newBalance.setT2(quantity);
 			secBalanceList.add(newBalance);
 			securitiesAccount.put(account, secBalanceList);
 		}
@@ -90,17 +89,17 @@ public class Asset {
 		return false;
 	}
 
-	public int getQuantitySecByAccount(String account, String secCode) throws Exception {
-		if (!accIsExistSecCode(account, secCode)) 
-			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
-		List<Security> secBalanceList = getAllSecuritiesByAccount(account);
-		int quantity = 0;
-		for (Security secBalance : secBalanceList) {
-			if (secBalance.getSecCode().equals(secCode))
-				quantity = secBalance.getQuantity();
-		}
-		return quantity;
-	}
+//	public int getQuantitySecByAccount(String account, String secCode) throws Exception {
+//		if (!accIsExistSecCode(account, secCode)) 
+//			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
+//		List<Security> secBalanceList = getAllSecuritiesByAccount(account);
+//		int quantity = 0;
+//		for (Security secBalance : secBalanceList) {
+//			if (secBalance.getSecCode().equals(secCode))
+//				quantity = secBalance.getQuantity();
+//		}
+//		return quantity;
+//	}
 	
 	public Security getSecurity (String account, String secCode) throws SystemException {
 		if (!accIsExistSecCode(account, secCode)) 
@@ -118,6 +117,7 @@ public class Asset {
 		if (secBalance.getQuantity() < quantity)
 			throw new SystemException(ExceptionCode.SECURITY_NOT_ENOUGH_QUANTITY.code(), ExceptionCode.SECURITY_NOT_ENOUGH_QUANTITY.message());
 		secBalance.setQuantity(secBalance.getQuantity() - quantity);
+		secBalance.setHold(quantity+secBalance.getHold());
 	}
 
 	public void unHoldMoney(String account, long money) throws SystemException {
@@ -128,8 +128,45 @@ public class Asset {
 
 	public void unHoldSecurity(String account, String secCode, int unHoldQuantity) throws SystemException {
 		Security secBalance = getSecurity(account, secCode);
+		if (secBalance.getHold() > 0) {
+			secBalance.setHold(secBalance.getHold() - unHoldQuantity);
+		}
+		//FIXME : doan nay cam giac so ho o cho neu hold >0 nhung hold < unhold thi se bi am??? - testUnholdSecurityDuplicateShouldRunRight()
 		secBalance.setQuantity(unHoldQuantity+secBalance.getQuantity());
 	}
 	
+	public void nextDay (String account, String secCode) throws SystemException {
+		if (!isAccountExist(account)) {
+			throw new SystemException(ExceptionCode.ACCOUNT_NOT_EXIST.code(), ExceptionCode.ACCOUNT_NOT_EXIST.message());
+		}
+		if (!accIsExistSecCode(account, secCode)) 
+			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
+		Security security = getSecurity(account, secCode);
+		if (security.getT2() > 0) {
+			security.setT1(security.getT2());
+			security.setT2(0);
+		}
+		
+		if (security.getT1() > 0) {
+			security.setT0(security.getT1());
+			security.setT1(0);
+		}
+		
+		if (security.getT0() > 0) {
+			security.setQuantity(security.getT0());
+			security.setT0(0);
+		}
+	}
+	
+	//for test
+	//TODO: co can dung mock ko?
+	public void initSecurity (String account, String secCode, int quantity) {
+		Security security = new Security();
+		security.setQuantity(quantity);
+		security.setSecCode(secCode);
+		secBalanceList.add(security); 
+		securitiesAccount.put(account, secBalanceList);
+
+	}
 	
 }

@@ -4,7 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -175,21 +178,8 @@ public class AssetTest {
 				secResult = secBalance.getSecCode();
 		}
 		assertEquals(secCode, secResult);
-		assertEquals(quantity, asset.getQuantitySecByAccount("1234", "ACB"));
-	}
-	
-	@Test
-	public void testGetQuantitySecByAccountShouldRunRight() throws Exception {
-		try {
-			String secCode = "ACB";
-			int quantity = 200;
-			asset.initMoneyForAccount("1234", 0);
-			asset.addSecurity("1234", secCode, quantity);
-			assertEquals(quantity, asset.getQuantitySecByAccount("1234", "ACB"));
-			asset.getQuantitySecByAccount("1234", "ACBB");
-		} catch (SystemException e) {
-			assertEquals(ExceptionCode.SEC_CODE_NOT_EXIST.code(), e.getCode());
-		}
+		Security security = asset.getSecurity("1234", secCode);
+		assertEquals(quantity, security.getT2());
 	}
 	
 	@Test
@@ -218,8 +208,11 @@ public class AssetTest {
 		assertEquals(2, secBalanceList.size());
 		assertEquals(true, asset.accIsExistSecCode("1234", "ACB"));
 		assertEquals(true, asset.accIsExistSecCode("1234", "VND"));
-		assertEquals(quantity1, asset.getQuantitySecByAccount("1234", "ACB"));
-		assertEquals(quantity2, asset.getQuantitySecByAccount("1234", "VND"));
+		Security security1 = asset.getSecurity("1234", "ACB");
+		Security security2 = asset.getSecurity("1234", "VND");
+
+		assertEquals(quantity1, security1.getT2());
+		assertEquals(quantity2, security2.getT2());
 	}
 	
 	@Test
@@ -237,8 +230,12 @@ public class AssetTest {
 		
 		List<Security> secBalanceList = asset.getAllSecuritiesByAccount("1234");
 		assertEquals(2, secBalanceList.size());
-		assertEquals(quantity1 + quantityNew, asset.getQuantitySecByAccount("1234", "ACB"));
-		assertEquals(quantity2, asset.getQuantitySecByAccount("1234", "VND"));
+		
+		Security security1 = asset.getSecurity("1234", "ACB");
+		Security security2 = asset.getSecurity("1234", "VND");
+
+		assertEquals(quantity1 + quantityNew, security1.getT2());
+		assertEquals(quantity2, security2.getT2());
 	}
 
 	@Test
@@ -254,19 +251,41 @@ public class AssetTest {
 	
 	@Test
 	public void testHoldSecurityShouldRunRight() throws Exception, SystemException {
-		String secCode1 = "ACB";
-		int quantity1 = 200;
-		int quantityNew =  150;
 		asset.initMoneyForAccount("1234", 0);
-		asset.addSecurity("1234", secCode1, quantity1);
-		asset.addSecurity("1234", secCode1, quantityNew);
+
+		String secCode1 = "ACB";
+		int quantity1 = 350;
+		asset.initSecurity("1234", secCode1, quantity1);
 		
 		String secCode2 = "VND";
 		int quantity2 = 500;
-		asset.addSecurity("1234", secCode2, quantity2);
+		asset.initSecurity("1234", secCode2, quantity2);
 		
 		asset.holdSecurity("1234", "ACB", 100);
-		assertEquals(250, asset.getQuantitySecByAccount("1234", "ACB"));
+		Security security = asset.getSecurity("1234", "ACB");
+
+		assertEquals(250, security.getQuantity());
+		assertEquals(100, security.getHold());
+		
+	}
+	
+	@Test
+	public void testHoldSecurityDuplicateShouldRunRight () throws SystemException {
+		asset.initMoneyForAccount("1234", 0);
+
+		String secCode1 = "ACB";
+		int quantity1 = 350;
+		asset.initSecurity("1234", secCode1, quantity1);
+		
+		String secCode2 = "VND";
+		int quantity2 = 500;
+		asset.initSecurity("1234", secCode2, quantity2);
+		
+		asset.holdSecurity("1234", "ACB", 100);
+		asset.holdSecurity("1234", "ACB", 50);
+		Security security = asset.getSecurity("1234", "ACB");
+		assertEquals(200, security.getQuantity());
+		assertEquals(150, security.getHold());
 	}
 	
 	@Test(expected = SystemException.class)
@@ -282,7 +301,9 @@ public class AssetTest {
 		asset.addSecurity("1234", secCode2, quantity2);
 		
 		asset.holdSecurity("1234", "ACB", 9999);
-		assertEquals(250, asset.getQuantitySecByAccount("1234", "ACB"));
+		Security security = asset.getSecurity("1234", "ACB");
+
+		assertEquals(250, security.getT2());
 	}
 	
 	@Test
@@ -290,8 +311,6 @@ public class AssetTest {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
 		int quantityNew =  150;
-
-		
         try {
     		asset.addSecurity("1234", secCode1, quantity1);
     		asset.addSecurity("1234", secCode1, quantityNew);
@@ -309,21 +328,38 @@ public class AssetTest {
 	
 	@Test
 	public void testUnHoldSecurityShouldRunRight() throws Exception {
-		String secCode1 = "ACB";
-		int quantity1 = 200;
-		int quantityNew =  150;
 		asset.initMoneyForAccount("1234", 0);
-		asset.addSecurity("1234", secCode1, quantity1);
-		asset.addSecurity("1234", secCode1, quantityNew);
-		
-		String secCode2 = "VND";
-		int quantity2 = 500;
-		asset.addSecurity("1234", secCode2, quantity2);
+
+		String secCode1 = "ACB";
+		int quantity1 = 350;
+		asset.initSecurity("1234", secCode1, quantity1);
+		asset.holdSecurity("1234", "ACB", 80);
+
+		Security security = asset.getSecurity("1234", secCode1);
+		int quantityAfterHold = security.getQuantity();
+		int holdInAccBeforeUnHold = security.getHold();//should be 0
+		int unHoldQuantity = 50;
+		asset.unHoldSecurity("1234", "ACB", unHoldQuantity);
+		Security securityAferUnHold = asset.getSecurity("1234", secCode1);
+
+		assertEquals(quantityAfterHold+unHoldQuantity, securityAferUnHold.getQuantity());
+		assertEquals(holdInAccBeforeUnHold - unHoldQuantity, securityAferUnHold.getHold());
+	}
+	
+	@Test
+	public void testUnholdSecurityDuplicateShouldRunRight () throws SystemException {
+		asset.initMoneyForAccount("1234", 0);
+
+		String secCode1 = "ACB";
+		int quantity1 = 350;
+		asset.initSecurity("1234", secCode1, quantity1);
 		
 		int unHoldQuantity = 100;
 		asset.unHoldSecurity("1234", "ACB", unHoldQuantity);
-		
-		assertEquals(asset.getQuantitySecByAccount("1234", secCode1), quantity1+quantityNew+unHoldQuantity);
+		asset.unHoldSecurity("1234", "ACB", unHoldQuantity);
+		Security security = asset.getSecurity("1234", secCode1);
+		assertEquals(550, security.getQuantity());
+		assertEquals(0, security.getHold());
 	}
 	
 	@Test
@@ -359,8 +395,6 @@ public class AssetTest {
 //		asset.addSecurity("1234", secCode1, quantity1);
 //		asset.addSecurity("1234", secCode2, quantity2);
 //		
-//		asset.nextDay("1234", secCode1);
-//		asset.nextDay("1234", secCode1);
 //		asset.nextDay("1234", secCode1);
 //		Security security = asset.getSecurity("1234", secCode1);
 //		assertEquals(quantity1, security.getQuantity());
