@@ -4,15 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import virtualstockexchange.exception.ExceptionCode;
 import virtualstockexchange.exception.SystemException;
@@ -28,7 +23,8 @@ public class AssetTest {
 
 	private void verifyInitMoneyForAccount(long expectedMoney) throws SystemException {
 		asset.initMoneyForAccount("1234", expectedMoney);
-		long moneyOfAccount = asset.getMoneyByAccount("1234");
+		Money moneyObj = asset.getMoney("1234");
+		long moneyOfAccount = moneyObj.getMoney();
 		assertEquals(expectedMoney, moneyOfAccount);
 	}
 
@@ -36,7 +32,8 @@ public class AssetTest {
 	public void testDuplicateInitMoney() throws SystemException {
 		asset.initMoneyForAccount("1234", 1000);
 		asset.initMoneyForAccount("1234", 2000);
-		long moneyOfAccount = asset.getMoneyByAccount("1234");
+		Money moneyObj = asset.getMoney("1234");
+		long moneyOfAccount = moneyObj.getMoney();
 		assertEquals(2000, moneyOfAccount);
 	}
 	
@@ -46,8 +43,12 @@ public class AssetTest {
 		long expectedMoneyOfAcc2 = 2000;
 		asset.initMoneyForAccount("1234", expectedMoneyOfAcc1);
 		asset.initMoneyForAccount("5678", expectedMoneyOfAcc2);
-		long moneyOfAcc1 = asset.getMoneyByAccount("1234");
-		long moneyOfAcc2 = asset.getMoneyByAccount("5678");
+		Money moneyObj1 = asset.getMoney("1234");
+		long moneyOfAcc1 = moneyObj1.getMoney();
+		
+		Money moneyObj2 = asset.getMoney("5678");
+		long moneyOfAcc2 = moneyObj2.getMoney();
+		
 		assertEquals(moneyOfAcc1, expectedMoneyOfAcc1);
 		assertEquals(moneyOfAcc2, expectedMoneyOfAcc2);
 	}
@@ -55,11 +56,13 @@ public class AssetTest {
 	@Test
 	public void testHoldMoneyShouldHoldRightValue() throws Exception {
 		asset.initMoneyForAccount("1234", 2500);
-		long moneyBeforeHold = asset.getMoneyByAccount("1234");
+		Money moneyObj1 = asset.getMoney("1234");		
+		long moneyBeforeHold = moneyObj1.getMoney();
 		long hold = 1000;
 		asset.holdMoney("1234", hold);
-		long money = asset.getMoneyByAccount("1234");
-		assertEquals(moneyBeforeHold, money + hold);
+		Money moneyObjAfterHold = asset.getMoney("1234");		
+		assertEquals(moneyBeforeHold - hold, moneyObjAfterHold.getMoney());
+		assertEquals(hold, moneyObjAfterHold.getHold());
 	}
 	
 	@Test
@@ -78,10 +81,12 @@ public class AssetTest {
 	public void testHoldMoneyWithHoldMoneyEqualCurrentMoney() throws Exception {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
-		long moneyBeforeHold = asset.getMoneyByAccount("1234");
+		Money moneyObj1 = asset.getMoney("1234");		
+		long moneyBeforeHold = moneyObj1.getMoney();
 		long hold = initMoney;
 		asset.holdMoney("1234", hold);
-		long money = asset.getMoneyByAccount("1234");
+		Money moneyObjAfterHold = asset.getMoney("1234");		
+		long money = moneyObjAfterHold.getMoney();
 		assertEquals(0, money);
 		assertEquals(0, moneyBeforeHold - hold);
 	}
@@ -119,10 +124,20 @@ public class AssetTest {
 	public void testUnHoldMoneyShouldRunRight () throws SystemException {
 		long initMoney = 2500;
 		asset.initMoneyForAccount("1234", initMoney);
-		long moneyBeforeUnHold = asset.getMoneyByAccount("1234");
-		long unHoldMoney = 2000;
+		//phai hold truoc khi unhold
+		long holdMoney = 2000;
+		asset.holdMoney("1234", holdMoney);
+		Money moneyObjAfterHold = asset.getMoney("1234");
+		
+		assertEquals(holdMoney, moneyObjAfterHold.getHold());
+		assertEquals(initMoney - holdMoney, moneyObjAfterHold.getMoney());
+		
+		long unHoldMoney = 1000;
 		asset.unHoldMoney("1234", unHoldMoney);
-		assertEquals(asset.getMoneyByAccount("1234"), unHoldMoney+moneyBeforeUnHold);
+		Money moneyObjAfterUnHold = asset.getMoney("1234");
+
+		assertEquals(initMoney - holdMoney + unHoldMoney, moneyObjAfterUnHold.getMoney()); //500
+		assertEquals(holdMoney - unHoldMoney, moneyObjAfterUnHold.getHold()); //1000
 	}
 	
 	@Test
@@ -145,9 +160,11 @@ public class AssetTest {
 		asset.initMoneyForAccount("1234", initMoney);
 
 		long addMoney = 1000;
-		long moneyBeforeAdd = asset.getMoneyByAccount("1234");
 		asset.addMoney("1234", addMoney);
-		assertEquals(asset.getMoneyByAccount("1234"), moneyBeforeAdd + addMoney);
+		Money moneyObjAfterAdd = asset.getMoney("1234");
+
+		assertEquals(initMoney, moneyObjAfterAdd.getMoney());
+		assertEquals(addMoney, moneyObjAfterAdd.getT2());
 	}
 	
 	@Test
@@ -336,8 +353,8 @@ public class AssetTest {
 		asset.holdSecurity("1234", "ACB", 80);
 
 		Security security = asset.getSecurity("1234", secCode1);
-		int quantityAfterHold = security.getQuantity();
-		int holdInAccBeforeUnHold = security.getHold();//should be 0
+		long quantityAfterHold = security.getQuantity();
+		long holdInAccBeforeUnHold = security.getHold();//should be 0
 		int unHoldQuantity = 50;
 		asset.unHoldSecurity("1234", "ACB", unHoldQuantity);
 		Security securityAferUnHold = asset.getSecurity("1234", secCode1);
@@ -389,16 +406,13 @@ public class AssetTest {
 	public void testSecurityNextDayShouldRunRight () throws Exception {
 		String secCode1 = "ACB";
 		int quantity1 = 200;
-		String secCode2 = "VND";
-		int quantity2 = 150;
 		asset.initMoneyForAccount("1234", 0);
 		//ong nay mua vao, ko quan tam hold
 		//T2 = quantity đặt mua
 		asset.addSecurity("1234", secCode1, quantity1);
-//		asset.addSecurity("1234", secCode2, quantity2);
 		
 		//sau khi chuyen ngay moi t1 = quantity mua, t2=0
-		asset.nextDay("1234", secCode1);
+		asset.nextSecurity("1234", secCode1);
 		Security security = asset.getSecurity("1234", secCode1);
 		assertEquals(quantity1, security.getT1());
 		assertEquals(0, security.getT2());
@@ -415,10 +429,9 @@ public class AssetTest {
 		asset.initMoneyForAccount("1234", 0);
 		asset.addSecurity("1234", secCode1, quantity1);
 		
-		//sau khi chuyen ngay moi t1 = quantity mua, t2=0
-		asset.nextDay("1234", secCode1);
-		asset.nextDay("1234", secCode1);
-		asset.nextDay("1234", secCode1);
+		asset.nextSecurity("1234", secCode1);
+		asset.nextSecurity("1234", secCode1);
+		asset.nextSecurity("1234", secCode1);
 		Security security = asset.getSecurity("1234", secCode1);
 		assertEquals(0, security.getT1());
 		assertEquals(0, security.getT2());
@@ -426,8 +439,36 @@ public class AssetTest {
 		assertEquals(quantity1, security.getQuantity());
 	}
 	
-	//TODO : add test getAllSecuritiesByAccount, getMoneyByAccount together shoud right
-
+	//TODO : add test getAllSecuritiesByAccount, getMoney together shoud right
+    @Test
+	//trong TH ban chung khoan doi tien ve, ban dau tien` phai la t2 sau do lui` dan ve t0, ve tai khoan 
+    public void testMoneyNextShouldRunRight () throws SystemException {
+    	asset.initMoneyForAccount("1234", 25000);
+    	long moneyAdd = 2500;
+    	asset.addMoney("1234", moneyAdd);
+    	asset.nextMoney("1234");
+    	Money money = asset.getMoney("1234");
+    	assertEquals(moneyAdd, money.getT1());
+    	assertEquals(0, money.getT2());
+    	assertEquals(0, money.getT0());
+    	assertEquals(25000, money.getMoney());
+    	
+    }
+    
+    @Test
+    public void testMoneyNextThreeDayShouldRunRight () throws SystemException {
+		asset.initMoneyForAccount("1234", 25000);
+		long moneyAdd = 2500;
+		asset.addMoney("1234", moneyAdd);
+		asset.nextMoney("1234");
+		asset.nextMoney("1234");
+		asset.nextMoney("1234");
+		Money money = asset.getMoney("1234");
+		assertEquals(0, money.getT1());
+		assertEquals(0, money.getT2());
+		assertEquals(0, money.getT0());
+		assertEquals(moneyAdd + 25000, money.getMoney());
+    }
 }
 
 

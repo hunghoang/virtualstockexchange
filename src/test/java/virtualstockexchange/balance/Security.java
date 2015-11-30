@@ -1,12 +1,8 @@
 package virtualstockexchange.balance;
 
-public class Security {
+public class Security extends TimeBalance {
 	String secCode;
-	int quantity;
-	int hold;
-	int t0;
-	int t1;
-	int t2;
+	long quantity;
 	
 	public String getSecCode() {
 		return secCode;
@@ -14,35 +10,11 @@ public class Security {
 	public void setSecCode(String secCode) {
 		this.secCode = secCode;
 	}
-	public int getQuantity() {
+	public long getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(int quantity) {
+	public void setQuantity(long quantity) {
 		this.quantity = quantity;
-	}
-	public int getT0() {
-		return t0;
-	}
-	public void setT0(int t0) {
-		this.t0 = t0;
-	}
-	public int getT1() {
-		return t1;
-	}
-	public void setT1(int t1) {
-		this.t1 = t1;
-	}
-	public int getT2() {
-		return t2;
-	}
-	public void setT2(int t2) {
-		this.t2 = t2;
-	}
-	public int getHold() {
-		return hold;
-	}
-	public void setHold(int hold) {
-		this.hold = hold;
 	}
 	
 }

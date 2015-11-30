@@ -13,15 +13,17 @@ import virtualstockexchange.exception.SystemException;
 public class Asset {
 	private static final Logger logger = Logger.getLogger(Asset.class);
 
-	private Map<String, Long> moneyAccount = new HashMap<>();
+	private Map<String, Money> moneyAccount = new HashMap<>();
 	private Map<String, List<Security>> securitiesAccount = new HashMap<>();
 	List<Security> secBalanceList = new ArrayList<Security>();
+	Money moneyObj = new Money();
 
-	public long getMoneyByAccount(String account) throws SystemException {
+	public Money getMoney(String account) throws SystemException {
 		if (!isAccountExist(account)) {
 			throw new SystemException(ExceptionCode.ACCOUNT_NOT_EXIST.code(), ExceptionCode.ACCOUNT_NOT_EXIST.message());
 		}
-		return moneyAccount.get(account);
+		moneyObj = moneyAccount.get(account);
+		return moneyObj;
 	}
 	
 	public boolean isAccountExist(String account) {
@@ -35,22 +37,39 @@ public class Asset {
 		if (moneyAccount.containsKey(account)) {
 			throw new RuntimeException();
 		}
-		moneyAccount.put(account, money);
+		Money moneyObj = new Money();
+		moneyObj.setMoney(money);
+		moneyAccount.put(account, moneyObj);
 	}
 
 	public void holdMoney(String account, long holdMoney) throws SystemException {
-		long currentMoney = getMoneyByAccount(account);
+		moneyObj = getMoney(account);
+		long currentMoney = moneyObj.getMoney();
 		if (holdMoney > currentMoney) {
 			throw new SystemException(ExceptionCode.MONEY_NOT_ENOUGH.code(), ExceptionCode.MONEY_NOT_ENOUGH.message());
 		}
 		currentMoney -= holdMoney;
-		moneyAccount.put(account, currentMoney);
+		moneyObj.setMoney(currentMoney);
+        moneyObj.setHold(holdMoney);
+
+		moneyAccount.put(account, moneyObj);
 	}
 
+	public void unHoldMoney(String account, long money) throws SystemException {
+		moneyObj = getMoney(account);
+		long currentMoney = moneyObj.getMoney();
+		currentMoney += money;
+		moneyObj.setHold(moneyObj.getHold() - money);
+		moneyObj.setMoney(currentMoney);
+		moneyAccount.put(account, moneyObj);
+	}
+	
 	public void addMoney(String account, long addMoney) throws SystemException {
-		long currentMoney = getMoneyByAccount(account);
+		moneyObj = getMoney(account);
+		long currentMoney = moneyObj.getT2();
 		currentMoney += addMoney;
-		moneyAccount.put(account, currentMoney);
+		moneyObj.setT2(currentMoney);
+		moneyAccount.put(account, moneyObj);
 	}
 
 	public void addSecurity(String account, String secCode, int quantity) throws Exception {
@@ -88,18 +107,6 @@ public class Asset {
 		}
 		return false;
 	}
-
-//	public int getQuantitySecByAccount(String account, String secCode) throws Exception {
-//		if (!accIsExistSecCode(account, secCode)) 
-//			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
-//		List<Security> secBalanceList = getAllSecuritiesByAccount(account);
-//		int quantity = 0;
-//		for (Security secBalance : secBalanceList) {
-//			if (secBalance.getSecCode().equals(secCode))
-//				quantity = secBalance.getQuantity();
-//		}
-//		return quantity;
-//	}
 	
 	public Security getSecurity (String account, String secCode) throws SystemException {
 		if (!accIsExistSecCode(account, secCode)) 
@@ -120,12 +127,6 @@ public class Asset {
 		secBalance.setHold(quantity+secBalance.getHold());
 	}
 
-	public void unHoldMoney(String account, long money) throws SystemException {
-		long currentMoney = getMoneyByAccount(account);
-		currentMoney += money;
-		moneyAccount.put(account, currentMoney);
-	}
-
 	public void unHoldSecurity(String account, String secCode, int unHoldQuantity) throws SystemException {
 		Security secBalance = getSecurity(account, secCode);
 		if (secBalance.getHold() > 0) {
@@ -135,7 +136,7 @@ public class Asset {
 		secBalance.setQuantity(unHoldQuantity+secBalance.getQuantity());
 	}
 	
-	public void nextDay (String account, String secCode) throws SystemException {
+	public void nextSecurity (String account, String secCode) throws SystemException {
 		if (!isAccountExist(account)) {
 			throw new SystemException(ExceptionCode.ACCOUNT_NOT_EXIST.code(), ExceptionCode.ACCOUNT_NOT_EXIST.message());
 		}
@@ -143,7 +144,7 @@ public class Asset {
 			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
 		Security security = getSecurity(account, secCode);
 		if (security.getT0() > 0) {
-			security.setQuantity(security.getT0());
+			security.setQuantity(security.getQuantity() + security.getT0());
 			security.setT0(0);
 		}		
 		if (security.getT1() > 0) {
@@ -164,7 +165,25 @@ public class Asset {
 		security.setSecCode(secCode);
 		secBalanceList.add(security); 
 		securitiesAccount.put(account, secBalanceList);
+	}
 
+	public void nextMoney(String account) throws SystemException {
+		if (!isAccountExist(account)) {
+			throw new SystemException(ExceptionCode.ACCOUNT_NOT_EXIST.code(), ExceptionCode.ACCOUNT_NOT_EXIST.message());
+		}
+		Money money = getMoney(account);
+		if (money.getT0() > 0) {
+			money.setMoney(money.getMoney() + money.getT0());
+			money.setT0(0);
+		}		
+		if (money.getT1() > 0) {
+			money.setT0(money.getT1());
+			money.setT1(0);
+		}
+		if (money.getT2() > 0) {
+			money.setT1(money.getT2());
+			money.setT2(0);
+		}
 	}
 	
 }
