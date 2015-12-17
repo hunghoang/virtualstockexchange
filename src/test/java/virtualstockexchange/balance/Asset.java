@@ -66,9 +66,9 @@ public class Asset {
 	
 	public void addMoney(String account, long addMoney) throws SystemException {
 		moneyObj = getMoney(account);
-		long currentMoney = moneyObj.getT2();
+		long currentMoney = moneyObj.getT0();
 		currentMoney += addMoney;
-		moneyObj.setT2(currentMoney);
+		moneyObj.setT0(currentMoney);
 		moneyAccount.put(account, moneyObj);
 	}
 
@@ -76,11 +76,11 @@ public class Asset {
 		//FIXME: add duplicate secCode shoud add more quantity
 		if (accIsExistSecCode(account, secCode)) {
 			Security secBalance = getSecurity(account, secCode);
-			secBalance.setT2(quantity+secBalance.getT2());
+			secBalance.setT0(quantity+secBalance.getT0());
 		} else {
 			Security newBalance = new Security();
 			newBalance.setSecCode(secCode);
-			newBalance.setT2(quantity);
+			newBalance.setT0(quantity);
 			secBalanceList.add(newBalance);
 			securitiesAccount.put(account, secBalanceList);
 		}
@@ -143,17 +143,17 @@ public class Asset {
 		if (!accIsExistSecCode(account, secCode)) 
 			throw new SystemException(ExceptionCode.SEC_CODE_NOT_EXIST.code(), ExceptionCode.SEC_CODE_NOT_EXIST.message());
 		Security security = getSecurity(account, secCode);
-		if (security.getT0() > 0) {
-			security.setQuantity(security.getQuantity() + security.getT0());
-			security.setT0(0);
+		if (security.getT2() > 0) {
+			security.setQuantity(security.getQuantity() + security.getT2());
+			security.setT2(0);
 		}		
 		if (security.getT1() > 0) {
-			security.setT0(security.getT1());
+			security.setT2(security.getT1());
 			security.setT1(0);
 		}
-		if (security.getT2() > 0) {
-			security.setT1(security.getT2());
-			security.setT2(0);
+		if (security.getT0() > 0) {
+			security.setT1(security.getT0());
+			security.setT0(0);
 		}
 	}
 	
@@ -172,18 +172,17 @@ public class Asset {
 			throw new SystemException(ExceptionCode.ACCOUNT_NOT_EXIST.code(), ExceptionCode.ACCOUNT_NOT_EXIST.message());
 		}
 		Money money = getMoney(account);
-		if (money.getT0() > 0) {
-			money.setMoney(money.getMoney() + money.getT0());
-			money.setT0(0);
-		}		
-		if (money.getT1() > 0) {
-			money.setT0(money.getT1());
-			money.setT1(0);
-		}
 		if (money.getT2() > 0) {
-			money.setT1(money.getT2());
+			money.setMoney(money.getMoney() + money.getT2());
 			money.setT2(0);
 		}
-	}
-	
+		if (money.getT1() > 0) {
+			money.setT2(money.getT1());
+			money.setT1(0);
+		}
+		if (money.getT0() > 0) {
+			money.setT1(money.getT0());
+			money.setT0(0);
+		}		
+	}	
 }

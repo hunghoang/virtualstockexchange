@@ -164,7 +164,7 @@ public class AssetTest {
 		Money moneyObjAfterAdd = asset.getMoney("1234");
 
 		assertEquals(initMoney, moneyObjAfterAdd.getMoney());
-		assertEquals(addMoney, moneyObjAfterAdd.getT2());
+		assertEquals(addMoney, moneyObjAfterAdd.getT0());
 	}
 	
 	@Test
@@ -196,7 +196,7 @@ public class AssetTest {
 		}
 		assertEquals(secCode, secResult);
 		Security security = asset.getSecurity("1234", secCode);
-		assertEquals(quantity, security.getT2());
+		assertEquals(quantity, security.getT0());
 	}
 	
 	@Test
@@ -228,8 +228,8 @@ public class AssetTest {
 		Security security1 = asset.getSecurity("1234", "ACB");
 		Security security2 = asset.getSecurity("1234", "VND");
 
-		assertEquals(quantity1, security1.getT2());
-		assertEquals(quantity2, security2.getT2());
+		assertEquals(quantity1, security1.getT0());
+		assertEquals(quantity2, security2.getT0());
 	}
 	
 	@Test
@@ -251,8 +251,8 @@ public class AssetTest {
 		Security security1 = asset.getSecurity("1234", "ACB");
 		Security security2 = asset.getSecurity("1234", "VND");
 
-		assertEquals(quantity1 + quantityNew, security1.getT2());
-		assertEquals(quantity2, security2.getT2());
+		assertEquals(quantity1 + quantityNew, security1.getT0());
+		assertEquals(quantity2, security2.getT0());
 	}
 
 	@Test
@@ -441,7 +441,7 @@ public class AssetTest {
 	
 	//TODO : add test getAllSecuritiesByAccount, getMoney together shoud right
     @Test
-	//trong TH ban chung khoan doi tien ve, ban dau tien` phai la t2 sau do lui` dan ve t0, ve tai khoan 
+	//trong TH ban chung khoan doi tien ve, ban dau tien` phai la t0 sau do tang dan len t2, ve tai khoan 
     public void testMoneyNextShouldRunRight () throws SystemException {
     	asset.initMoneyForAccount("1234", 25000);
     	long moneyAdd = 2500;
