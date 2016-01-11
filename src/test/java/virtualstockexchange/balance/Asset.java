@@ -1,4 +1,4 @@
-package virtualstockexchange.balance;
+/*package virtualstockexchange.balance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import virtualstockexchange.exception.SystemException;
 public class Asset {
 	private static final Logger logger = Logger.getLogger(Asset.class);
 
-	private Map<String, Money> moneyAccount = new HashMap<>();
+	private Map<String, Money> moneyAccount = new HashMap<String, Money>();
 	private Map<String, List<Security>> securitiesAccount = new HashMap<>();
 	List<Security> secBalanceList = new ArrayList<Security>();
 	Money moneyObj = new Money();
@@ -186,3 +186,4 @@ public class Asset {
 		}		
 	}	
 }
+*/

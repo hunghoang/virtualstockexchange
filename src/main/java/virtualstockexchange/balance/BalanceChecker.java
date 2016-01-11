@@ -1,4 +1,4 @@
-package virtualstockexchange.balance;
+/*package virtualstockexchange.balance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import virtualstockexchange.price.PriceService;
 
-@Component
 public class BalanceChecker {
 	long DEFAULT_MONEY = 50000000;
 	Map<String, List<Balance>> balanceMap = new HashMap<String, List<Balance>>();
@@ -241,4 +240,4 @@ public class BalanceChecker {
 			balance.setT0(-(balance.getT0()));
 		}
 	}
-}
+}*/
