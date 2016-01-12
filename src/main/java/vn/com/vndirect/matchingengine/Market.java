@@ -105,6 +105,10 @@ public class Market {
 		return order;
 	}
 
+	public Order getOrder(String orderId) {
+		return orders.get(orderId);
+	}
+	
 	public List<Order> getAllOrders() {
 		return new ArrayList<Order>(historyOrders.values());
 	}

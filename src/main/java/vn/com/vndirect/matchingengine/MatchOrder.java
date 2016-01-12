@@ -35,7 +35,6 @@ public class MatchOrder {
 		}
 
 		if (isMatch(results)) {
-			results.add(order);
 			updatePriceIfMarketOrder(order);
 		}
 		
@@ -65,12 +64,12 @@ public class MatchOrder {
 		}
 	}
 
-	private void match2Orders(List<Order> results, Order newOrder,
-			Order existing) {
+	private void match2Orders(List<Order> results, Order newOrder, Order existing) {
 		int matchQuantity = getMatchQuantity(newOrder, existing);
 		if (matchQuantity > 0) {
 			matchPriceAndQuantity(newOrder, existing, matchQuantity);
-			results.add(existing);
+			results.add(existing.clone());
+			results.add(newOrder.clone());
 		}
 	}
 

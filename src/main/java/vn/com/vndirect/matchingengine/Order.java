@@ -186,4 +186,13 @@ public class Order {
 	public void setPrice(long price) {
 		this.price = price;
 	}
+	
+	public Order clone() {
+		Order order = new Order(account, symbol, price, quantity, side);
+		order.setOrderId(orderId);
+		order.setOrderType(orderType);
+		order.setStatus(status);
+		order.setMatch(matchPrice, lastMatchQuantity);
+		return order;
+	}
 }

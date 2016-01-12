@@ -31,9 +31,9 @@ public class CallMarketMatchOrder {
 		List<Order> results = new ArrayList<Order>();
 		long bestPrice = findBestPrice();
 		if (bestPrice > 0) {
-			List<Order> couldMatchBuyOrder = couldMatchBuyOrderAtPrice(bestPrice);
-			List<Order> couldMatchSellOrder = couldMatchSellOrderAtPrice(bestPrice);
-			return matchOrders(bestPrice, couldMatchBuyOrder, couldMatchSellOrder);
+			List<Order> buyOrderCouldMatch = buyOrderCouldMatchAtPrice(bestPrice);
+			List<Order> sellOrderCouldMatch = sellCouldMatchOrderAtPrice(bestPrice);
+			return matchOrders(bestPrice, buyOrderCouldMatch, sellOrderCouldMatch);
 		}
 		return results;
 	}
@@ -54,13 +54,13 @@ public class CallMarketMatchOrder {
 		if (matchQuantity > 0) {
 			buyOrder.setMatch(bestPrice, matchQuantity);
 			sellOrder.setMatch(bestPrice, matchQuantity);
-			results.add(buyOrder);
-			results.add(sellOrder);
+			results.add(buyOrder.clone());
+			results.add(sellOrder.clone());
 		}
 		return results;
 	}
 
-	private List<Order> couldMatchSellOrderAtPrice(long bestPrice) {
+	private List<Order> sellCouldMatchOrderAtPrice(long bestPrice) {
 		List<Order> results = new ArrayList<Order>();
 		for(Order order: sellOrders) {
 			if (order.getPrice() <= bestPrice) {
@@ -70,7 +70,7 @@ public class CallMarketMatchOrder {
 		return results;
 	}
 
-	private List<Order> couldMatchBuyOrderAtPrice(long bestPrice) {
+	private List<Order> buyOrderCouldMatchAtPrice(long bestPrice) {
 		List<Order> results = new ArrayList<Order>();
 		for(Order order: buyOrders) {
 			if (order.getPrice() == 0 || order.getPrice() >= bestPrice) {

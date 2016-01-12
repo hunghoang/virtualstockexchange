@@ -66,13 +66,15 @@ public class CallMarketMatchOrderTest {
 		List<Order> orders = matchOrder.match();
 		Assert.assertEquals(4, orders.size());
 		Assert.assertEquals(12300, orders.get(0).getMatchPrice());
-		Assert.assertEquals(1200, orders.get(0).getMatchQuantity());
+		Assert.assertEquals(1000, orders.get(0).getMatchQuantity());
 		Assert.assertEquals(12300, orders.get(1).getMatchPrice());
 		Assert.assertEquals(1000, orders.get(1).getMatchQuantity());
 		Assert.assertEquals(12300, orders.get(2).getMatchPrice());
-		Assert.assertEquals(1200, orders.get(2).getMatchQuantity());
+		Assert.assertEquals(200, orders.get(2).getMatchQuantity());
 		Assert.assertEquals(12300, orders.get(3).getMatchPrice());
 		Assert.assertEquals(200, orders.get(3).getMatchQuantity());
+		Assert.assertEquals(12300, order3.getMatchPrice());
+		Assert.assertEquals(1200, order3.getMatchQuantity());
 	}
 	
 	@Test
@@ -88,22 +90,25 @@ public class CallMarketMatchOrderTest {
 		List<Order> orders = matchOrder.match();
 		Assert.assertEquals(6, orders.size());
 		Assert.assertEquals(12300, orders.get(0).getMatchPrice());
-		Assert.assertEquals(1200, orders.get(0).getMatchQuantity());
+		Assert.assertEquals(900, orders.get(0).getMatchQuantity());
 		
 		Assert.assertEquals(12300, orders.get(1).getMatchPrice());
 		Assert.assertEquals(900, orders.get(1).getMatchQuantity());
 		
 		Assert.assertEquals(12300, orders.get(2).getMatchPrice());
-		Assert.assertEquals(1200, orders.get(2).getMatchQuantity());
+		Assert.assertEquals(200, orders.get(2).getMatchQuantity());
 		
 		Assert.assertEquals(12300, orders.get(3).getMatchPrice());
 		Assert.assertEquals(200, orders.get(3).getMatchQuantity());
 
 		Assert.assertEquals(12300, orders.get(4).getMatchPrice());
-		Assert.assertEquals(1200, orders.get(4).getMatchQuantity());
+		Assert.assertEquals(100, orders.get(4).getMatchQuantity());
 
 		Assert.assertEquals(12300, orders.get(5).getMatchPrice());
 		Assert.assertEquals(100, orders.get(5).getMatchQuantity());
+		
+		Assert.assertEquals(12300, order3.getMatchPrice());
+		Assert.assertEquals(1200, order3.getMatchQuantity());
 	}
 
 }
